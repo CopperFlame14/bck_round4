@@ -112,78 +112,97 @@ function mockResponse(query, category) {
     return { category: detected, urgency: mock.urgency, suggested_reply: mock.suggested_reply };
 }
 
-// ── Gemini API Call with Retry ───────────────────────────────────────
-async function callGemini(prompt, retries = 3) {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-        try {
-            const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 512,
-                        responseMimeType: 'application/json'
-                    },
-                    safetySettings: [
-                        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
-                        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
-                    ]
-                })
-            });
+// ── Gemini API Call with Retry + Global Cooldown ─────────────────────
+const MODELS = ['gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+let _rateLimitedUntil = 0; // timestamp — skip Gemini calls until this clears
 
-            // Rate limited — backoff and retry
-            if (res.status === 429) {
-                const wait = Math.pow(2, attempt + 1) * 1000;
-                console.warn(`⏳ Gemini 429 rate limited. Waiting ${wait / 1000}s (attempt ${attempt + 1}/${retries})`);
-                if (attempt < retries) {
-                    await new Promise(r => setTimeout(r, wait));
-                    continue;
-                }
-                throw new Error('Rate limit exceeded after retries');
-            }
+async function callGemini(prompt, retries = 2) {
+    // Skip if we're in cooldown
+    if (Date.now() < _rateLimitedUntil) {
+        const secs = Math.ceil((_rateLimitedUntil - Date.now()) / 1000);
+        console.log(`⏸️ Gemini cooldown active (${secs}s remaining). Skipping API call.`);
+        return null;
+    }
 
-            if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
+    for (const model of MODELS) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
-            const data = await res.json();
-            let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-            if (!rawText) {
-                console.warn('⚠️ Gemini returned empty response. Reason:', data.candidates?.[0]?.finishReason);
-                return null;
-            }
-
-            // Strip code fences
-            rawText = rawText.trim();
-            if (rawText.startsWith('```')) {
-                rawText = rawText.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
-            }
-
-            // Parse JSON
-            let result;
+        for (let attempt = 0; attempt <= retries; attempt++) {
             try {
-                result = JSON.parse(rawText);
-            } catch (e) {
-                const match = rawText.match(/\{[\s\S]*\}/);
-                if (match) result = JSON.parse(match[0]);
-                else throw new Error('Invalid JSON from Gemini');
+                const res = await fetch(`${url}?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 512,
+                            responseMimeType: 'application/json'
+                        },
+                        safetySettings: [
+                            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+                            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+                        ]
+                    })
+                });
+
+                if (res.status === 429) {
+                    // Set global cooldown of 60s
+                    _rateLimitedUntil = Date.now() + 60000;
+                    console.warn(`⏳ ${model} rate limited (429). Cooldown 60s.`);
+                    break; // try next model
+                }
+
+                if (res.status === 404) {
+                    console.warn(`⚠️ ${model} not available. Trying next model.`);
+                    break; // try next model
+                }
+
+                if (!res.ok) throw new Error(`Gemini HTTP ${res.status}`);
+
+                const data = await res.json();
+                let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+                if (!rawText) {
+                    console.warn(`⚠️ ${model} returned empty response.`);
+                    return null;
+                }
+
+                // Strip code fences
+                rawText = rawText.trim();
+                if (rawText.startsWith('```')) {
+                    rawText = rawText.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
+                }
+
+                // Parse JSON
+                let result;
+                try {
+                    result = JSON.parse(rawText);
+                } catch (e) {
+                    const match = rawText.match(/\{[\s\S]*\}/);
+                    if (match) result = JSON.parse(match[0]);
+                    else throw new Error('Invalid JSON from Gemini');
+                }
+
+                // Validate
+                const validCats = ['appointment', 'medical_query', 'billing', 'emergency', 'general'];
+                const validUrgs = ['low', 'medium', 'high'];
+                if (!validCats.includes(result.category)) result.category = 'general';
+                if (!validUrgs.includes(result.urgency)) result.urgency = 'medium';
+                if (!result.suggested_reply) result.suggested_reply = 'Thank you for reaching out. Our team will respond shortly.';
+
+                console.log(`✅ Gemini (${model}) response OK`);
+                _rateLimitedUntil = 0; // clear cooldown on success
+                return result;
+
+            } catch (err) {
+                console.error(`❌ ${model} attempt ${attempt + 1}:`, err.message);
+                if (attempt < retries) {
+                    await new Promise(r => setTimeout(r, 2000));
+                }
             }
-
-            // Validate fields
-            const validCats = ['appointment', 'medical_query', 'billing', 'emergency', 'general'];
-            const validUrgs = ['low', 'medium', 'high'];
-            if (!validCats.includes(result.category)) result.category = 'general';
-            if (!validUrgs.includes(result.urgency)) result.urgency = 'medium';
-            if (!result.suggested_reply) result.suggested_reply = 'Thank you for reaching out. Our team will respond shortly.';
-
-            return result;
-
-        } catch (err) {
-            console.error(`❌ Gemini attempt ${attempt + 1} failed:`, err.message);
-            if (attempt >= retries) return null;
         }
     }
     return null;
