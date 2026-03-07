@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Hospital Intelligence Platform — Login</title>
+  <meta name="description"
+    content="Secure login to the AI Hospital Intelligence Platform — a unified healthcare SaaS platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../ui/design-system.css">
+
+  <style>
+    body {
+      background: #0F1117;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* Landing sections */
+    .landing-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(46, 134, 222, 0.1);
+      color: #3898EC;
+      border: 1px solid rgba(46, 134, 222, 0.2);
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(3.2rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      color: #94a3b8;
+      line-height: 1.6;
+      max-width: 650px;
+      margin: 0 auto 40px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px 32px;
+      transition: transform 0.3s;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .auth-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+      padding: 40px 20px;
+    }
+
+    /* Animated gradient mesh background */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 80% at 20% 20%, rgba(46, 134, 222, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(76, 209, 55, 0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        #0F1117;
+      z-index: 0;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.25;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: #2E86DE;
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: #4CD137;
+      bottom: -50px;
+      right: 100px;
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      background: #8b5cf6;
+      top: 40%;
+      right: -50px;
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      33% {
+        transform: translate(20px, -20px) scale(1.05);
+      }
+
+      66% {
+        transform: translate(-15px, 15px) scale(0.97);
+      }
+    }
+
+    /* Grid overlay */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 0;
+    }
+
+    /* Login wrapper */
+    .login-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 24px;
+    }
+
+    /* Logo top */
+    .login-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #2E86DE, #4CD137);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(46, 134, 222, 0.4);
+    }
+
+    .login-logo h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.3;
+    }
+
+    .login-logo p {
+      font-size: 0.78rem;
+      color: #64748B;
+      margin-top: 3px;
+    }
+
+    /* Login card */
+    .login-card {
+      background: rgba(30, 34, 53, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(46, 134, 222, 0.08);
+    }
+
+    .login-card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .login-card .subtitle {
+      font-size: 0.84rem;
+      color: #64748B;
+      margin-bottom: 28px;
+    }
+
+    /* Dark form controls */
+    .dark-input {
+      width: 100%;
+      padding: 11px 14px 11px 42px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: #E2E8F0;
+      outline: none;
+      transition: all 0.22s;
+    }
+
+    .dark-input:focus {
+      border-color: #2E86DE;
+      background: rgba(46, 134, 222, 0.06);
+      box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.15);
+    }
+
+    .dark-input::placeholder {
+      color: #475569;
+    }
+
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #475569;
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .dark-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #94A3B8;
+      margin-bottom: 7px;
+    }
+
+    /* Role pills */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .role-pill {
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #94A3B8;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .role-pill:hover {
+      border-color: #2E86DE;
+      color: #E2E8F0;
+      background: rgba(46, 134, 222, 0.08);
+    }
+
+    .role-pill.selected {
+      border-color: #2E86DE;
+      color: #2E86DE;
+      background: rgba(46, 134, 222, 0.12);
+      font-weight: 500;
+    }
+
+    /* Login button */
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #2E86DE, #1A6FBF);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.22s;
+      box-shadow: 0 6px 20px rgba(46, 134, 222, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, #3d9ae3, #2278c9);
+      box-shadow: 0 8px 28px rgba(46, 134, 222, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Demo info */
+    .demo-notice {
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: rgba(46, 134, 222, 0.08);
+      border: 1px solid rgba(46, 134, 222, 0.2);
+      border-radius: 10px;
+      font-size: 0.78rem;
+      color: #64748B;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .demo-notice strong {
+      color: #94A3B8;
+    }
+
+    /* Error message */
+    .error-msg {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #EE7066;
+      font-size: 0.82rem;
+      margin-bottom: 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Patient portal link */
+    .patient-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .patient-link a {
+      color: #4CD137;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .patient-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      font-size: 0.72rem;
+      color: #334155;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4CD137;
+      animation: pulseDot 2s infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-mesh"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Hero Section -->
+  <section class="landing-section">
+    <div class="hero-content">
+      <div class="badge">Healthcare Intelligence Platform</div>
+      <h1 class="hero-title">SmartCare <span
+          style="background:linear-gradient(135deg, #2E86DE, #4CD137);-webkit-background-clip:text;background-clip:text;color:transparent;">AI</span>
+      </h1>
+      <p class="hero-subtitle">Next-generation hospital analytics and patient operations powered by deep learning.</p>
+      <button
+        style="padding:14px 32px; font-size:1.1rem; border-radius:12px; background:white; color:#0F1117; font-weight:700; border:none; cursor:pointer;"
+        onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})">Access Platform</button>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="landing-section">
+    <h2 style="font-size:3rem; font-weight:800; margin-bottom:56px; text-align:center; letter-spacing:-0.04em;">Platform
+      <span style="color:#4CD137;">Tracks</span>
+    </h2>
+    <div class="features-grid">
+      <div class="glass-card">
+        <i class="fas fa-brain" style="font-size:2.8rem; color:#2E86DE; margin-bottom:24px; display:block;"></i>
+        <h3 style="font-size:1.4rem; margin-bottom:12px;">Predictive AI</h3>
+        <p style="color:#94a3b8; line-height:1.6; font-size:0.95rem;">Anticipate patient volume spikes before they
+          happen using our deep learning forecast engine.</p>
+      </div>
+      <div class="glass-card">
+        <i class="fas fa-chart-pie" style="font-size:2.8rem; color:#8b5cf6; margin-bottom:24px; display:block;"></i>
+        <h3 style="font-size:1.4rem; margin-bottom:12px;">Deep Insights</h3>
+        <p style="color:#94a3b8; line-height:1.6; font-size:0.95rem;">Drill down into department-level performance with
+          multi-dimensional data visualizations.</p>
+      </div>
+      <div class="glass-card">
+        <i class="fas fa-user-injured" style="font-size:2.8rem; color:#4CD137; margin-bottom:24px; display:block;"></i>
+        <h3 style="font-size:1.4rem; margin-bottom:12px;">Patient Portal</h3>
+        <p style="color:#94a3b8; line-height:1.6; font-size:0.95rem;">Seamless medical query submission and appointment
+          booking directly from the dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Section -->
+  <section class="auth-section" id="auth-section">
+    <div class="login-wrapper">
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
+        <h1>AI Hospital Intelligence<br>Platform</h1>
+        <p>Unified Healthcare SaaS Operations</p>
+      </div>
+
+      <!-- Login Card -->
+      <div class="login-card">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your hospital workspace</p>
+
+        <!-- Role Select -->
+        <div style="margin-bottom:18px;">
+          <label class="dark-label">Select Role</label>
+          <div class="role-grid">
+            <button class="role-pill selected" onclick="selectRole('admin', this)" id="role-admin">
+              <i class="fas fa-user-shield" style="margin-right:6px;"></i>Admin
+            </button>
+            <button class="role-pill" onclick="selectRole('patient', this)" id="role-patient">
+              <i class="fas fa-user-injured" style="margin-right:6px;"></i>Patient
+            </button>
+          </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-msg" id="errorMsg">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="errorText">Invalid credentials. Please try again.</span>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="dark-label">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" class="dark-input" id="emailInput" placeholder="admin@hospital.com"
+              value="demo@hospital.com" autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="dark-label">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" class="dark-input" id="passwordInput" placeholder="••••••••" value="Demo@1234"
+              autocomplete="current-password">
+          </div>
+        </div>
+
+        <!-- Hospital ID -->
+        <div class="form-group">
+          <label class="dark-label">Hospital ID</label>
+          <div class="input-wrapper">
+            <i class="fas fa-hospital input-icon"></i>
+            <input type="text" class="dark-input" id="hospitalInput" placeholder="e.g. hospital_abc"
+              value="demo_hospital">
+          </div>
+        </div>
+
+        <!-- Login Button -->
+        <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+          <i class="fas fa-sign-in-alt"></i>
+          Sign In to Dashboard
+        </button>
+
+        <!-- Demo Notice -->
+        <div class="demo-notice">
+          <strong>Demo Mode:</strong> Click "Sign In" to access the full platform with live mock data.<br>
+          Firebase Auth optional — demo bypasses authentication.
+        </div>
+      </div>
+
+
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span><span class="status-dot"></span></span>
+        <span>System Operational</span>
+        <span>·</span>
+        <span>Firebase Connected</span>
+        <span>·</span>
+        <span>AI Ready</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="../services/firebase.js"></script>
+  <script>
+    let selectedRole = 'admin';
+
+    function selectRole(role, el) {
+      selectedRole = role;
+      document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+
+      const emailInput = document.getElementById('emailInput');
+      if (role === 'patient') {
+        emailInput.value = 'patient@hospital.com';
+      } else {
+        emailInput.value = 'demo@hospital.com';
+      }
+    }
+
+    async function handleLogin() {
+      const btn = document.getElementById('loginBtn');
+      const errDiv = document.getElementById('errorMsg');
+      const errText = document.getElementById('errorText');
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const hospitalId = document.getElementById('hospitalInput').value.trim() || 'demo_hospital';
+
+      errDiv.style.display = 'none';
+
+      if (!email) {
+        errText.textContent = 'Please enter your email address.';
+        errDiv.style.display = 'flex';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+      // Set hospital context
+      localStorage.setItem('hospitalId', hospitalId);
+      localStorage.setItem('userRole', selectedRole);
+      localStorage.setItem('userName', email.split('@')[0]);
+
+      try {
+        // Try Firebase auth if available
+        if (window.FirebaseService?.signIn && email !== 'demo@hospital.com') {
+          await window.FirebaseService.signIn(email, password);
+        }
+        // Always proceed to dashboard (demo mode bypass)
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 600);
+      } catch (err) {
+        // Demo bypass — proceed anyway
+        console.warn('Firebase auth failed, using demo mode:', err.message);
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+      }
+    }
+
+    // Allow Enter key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  </script>
+</body>
+
+</html>

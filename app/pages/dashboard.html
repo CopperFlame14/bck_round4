@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Hospital Intelligence Platform</title>
+    <meta name="description" content="Unified hospital SaaS platform — analytics, alerts, AI response, workflow, CDSS.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../ui/design-system.css">
+    <link rel="stylesheet" href="../ui/patient.css">
+    <link rel="stylesheet" href="../ui/layout.css">
+    <style>
+        /* ── Dashboard-specific styles ── */
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-sub {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .section-hdr {
+            margin-bottom: 22px;
+        }
+
+        /* Charts grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .charts-grid-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        /* Gauge wrapper */
+        .gauge-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        #efficiencyGauge {
+            max-width: 200px;
+            max-height: 120px;
+        }
+
+        /* Predictions grid */
+        .pred-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        /* AI Response layout */
+        .ai-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ai-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(243, 156, 18, 0.08);
+            border: 1px solid rgba(243, 156, 18, 0.25);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 0.82rem;
+        }
+
+        .ai-textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 12px;
+            background: var(--bg);
+            border: 1.5px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .ai-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 134, 222, 0.1);
+        }
+
+        /* CDSS form */
+        .cdss-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Settings card */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .settings-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        /* Appts table */
+        .appt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .appt-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .appt-table td {
+            padding: 10px 12px;
+            font-size: 0.86rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .appt-table tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        /* Urgency filter btn */
+        .filter-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .filter-btn {
+            padding: 5px 14px;
+            border-radius: var(--radius-full);
+            border: 1.5px solid var(--border-strong);
+            background: transparent;
+            font-size: 0.78rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-btn.active {
+            border-color: var(--primary);
+            background: rgba(46, 134, 222, 0.08);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Workflow detail modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* Query detail split */
+        .query-detail-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .detail-field {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-field .lbl {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .detail-field .val {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        @media(max-width:900px) {
+
+            .charts-grid,
+            .charts-grid-3,
+            .cdss-layout,
+            .ai-layout,
+            .query-detail-split {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-grid,
+            .pred-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon"><i class="fas fa-heartbeat"></i></div>
+                <div class="sidebar-brand-name">AI Hospital<br><span class="sidebar-brand-sub">Intelligence
+                        Platform</span></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label sidebar-label">Main</div>
+                <div class="sidebar-nav-item active" onclick="switchSection('dashboard',this)" data-section="dashboard">
+                    <span class="nav-icon"><i class="fas fa-th-large"></i></span><span
+                        class="sidebar-label">Dashboard</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('analytics',this)" data-section="analytics">
+                    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span
+                        class="sidebar-label">Analytics</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('alerts',this)" data-section="alerts">
+                    <span class="nav-icon"><i class="fas fa-bell"></i></span><span class="sidebar-label">Alerts</span>
+                    <span class="nav-badge" id="alertsBadge" style="display:none;">0</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('queries',this)" data-section="queries">
+                    <span class="nav-icon"><i class="fas fa-inbox"></i></span><span class="sidebar-label">Patient
+                        Queries</span>
+                    <span class="nav-badge" id="queriesBadge" style="display:none;">0</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('appointments',this)" data-section="appointments">
+                    <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span><span
+                        class="sidebar-label">Appointments</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('workflow',this)" data-section="workflow">
+                    <span class="nav-icon"><i class="fas fa-project-diagram"></i></span><span
+                        class="sidebar-label">Workflow Manager</span>
+                </div>
+                <div class="sidebar-section-label sidebar-label" style="margin-top:8px;">Intelligence</div>
+                <div class="sidebar-nav-item" onclick="switchSection('ai-responder',this)" data-section="ai-responder">
+                    <span class="nav-icon"><i class="fas fa-robot"></i></span><span class="sidebar-label">AI Response
+                        Assistant</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('cdss',this)" data-section="cdss">
+                    <span class="nav-icon"><i class="fas fa-stethoscope"></i></span><span class="sidebar-label">Clinical
+                        CDSS</span>
+                </div>
+                <div class="sidebar-section-label sidebar-label" style="margin-top:8px;">System</div>
+                <div class="sidebar-nav-item" onclick="switchSection('settings',this)" data-section="settings">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span><span class="sidebar-label">Settings</span>
+                </div>
+                <div class="sidebar-nav-item" onclick="switchSection('patient',this)" data-section="patient"
+                    id="navPatient">
+                    <span class="nav-icon"><i class="fas fa-user-injured"></i></span><span class="sidebar-label">Patient
+                        Portal</span>
+                </div>
+            </nav>
+
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left"
+                    id="toggleIcon"></i></button>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar" id="userAvatar">AD</div>
+                    <div class="sidebar-user-info">
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role" id="userRole">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+        <!-- ===== MAIN AREA ===== -->
+        <div class="main-area">
+
+            <!-- TOP HEADER -->
+            <header class="top-header">
+                <button
+                    style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:1.1rem;display:none;"
+                    id="mobileMenuBtn" onclick="openMobileSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div style="flex:1;">
+                    <div class="header-title" id="pageTitle">Dashboard</div>
+                </div>
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" placeholder="Search patients, queries...">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn"
+                        onclick="switchSection('alerts', document.querySelector('[data-section=alerts]'))"
+                        title="Alerts">
+                        <i class="fas fa-bell"></i><span class="notif-dot" id="notifDot"></span>
+                    </button>
+                    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme">
+                        <i class="fas fa-sun" id="themeIcon"></i>
+                    </button>
+                    <div class="header-avatar" id="headerAvatar" title="Profile">AD</div>
+                    <button class="icon-btn" onclick="handleSignOut()" title="Sign Out"><i
+                            class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <div class="content-area">
+
+                <!-- ============================= DASHBOARD ============================= -->
+                <section class="section-panel active" id="sec-dashboard">
+                    <div class="section-hdr flex-between">
+                        <div>
+                            <div class="section-title">Hospital Overview</div>
+                            <div class="section-sub" id="dashboardTime">Loading...</div>
+                        </div>
+                        <button class="btn btn-ghost btn-sm" onclick="refreshAll()"><i class="fas fa-sync-alt"></i>
+                            Refresh</button>
+                    </div>
+
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid" id="kpiGrid"></div>
+
+                    <!-- Charts + Gauge -->
+                    <div class="charts-grid-3" style="margin-top:20px;">
+                        <div class="chart-card">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-users"
+                                        style="margin-right:6px;color:var(--primary);"></i>Patient Volume by
+                                    Department</span></div>
+                            <canvas id="patientsChart" style="height:240px;"></canvas>
+                        </div>
+                        <div class="chart-card" style="display:flex;flex-direction:column;">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-tachometer-alt"
+                                        style="margin-right:6px;color:#4CD137;"></i>Efficiency Score</span></div>
+                            <div class="gauge-wrap">
+                                <canvas id="efficiencyGauge" width="220" height="130"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid" style="margin-top:16px;">
+                        <div class="chart-card">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-clock"
+                                        style="margin-right:6px;color:#F39C12;"></i>Wait Time Trend</span></div>
+                            <canvas id="waitTimeChart" style="height:200px;"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-hospital"
+                                        style="margin-right:6px;color:#8b5cf6;"></i>Dept Workload Distribution</span>
+                            </div>
+                            <canvas id="deptLoadChart" style="height:200px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Smart Alerts Preview -->
+                    <div class="card" style="margin-top:20px;">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fas fa-bell"
+                                    style="margin-right:6px;color:#E74C3C;"></i>Active Alerts</span>
+                            <button class="btn btn-ghost btn-sm"
+                                onclick="switchSection('alerts',document.querySelector('[data-section=alerts]'))">View
+                                All →</button>
+                        </div>
+                        <div id="alertsContainer"></div>
+                    </div>
+                </section>
+
+                <!-- ============================= ANALYTICS ============================= -->
+                <section class="section-panel" id="sec-analytics">
+                    <div class="section-hdr">
+                        <div class="section-title">Analytics & Insights</div>
+                        <div class="section-sub">Deep-dive visualizations and trend analysis</div>
+                    </div>
+                    <div class="kpi-grid" id="kpiGridAnalytics"></div>
+                    <div class="pred-grid" id="predictionsContainer" style="margin-top:20px;"></div>
+                    <div class="charts-grid" style="margin-top:20px;">
+                        <div class="chart-card">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-chart-bar"
+                                        style="margin-right:6px;color:var(--primary);"></i>Department Patient
+                                    Load</span></div>
+                            <canvas id="patientsChart2" style="height:250px;"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="card-header"><span class="card-title"><i class="fas fa-chart-line"
+                                        style="margin-right:6px;color:#F39C12;"></i>Wait Time Trends (15-point)</span>
+                            </div>
+                            <canvas id="waitTimeChart2" style="height:250px;"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================= ALERTS ============================= -->
+                <section class="section-panel" id="sec-alerts">
+                    <div class="section-hdr flex-between">
+                        <div>
+                            <div class="section-title">Smart Alert Engine</div>
+                            <div class="section-sub">Real-time threshold monitoring across all departments</div>
+                        </div>
+                        <button class="btn btn-ghost btn-sm" onclick="window.Alerts.loadDemoAlerts()"><i
+                                class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div id="alertsContainer2"></div>
+                </section>
+
+                <!-- ============================= PATIENT QUERIES ============================= -->
+                <section class="section-panel" id="sec-queries">
+                    <div id="incomingListView">
+                        <div class="section-hdr flex-between">
+                            <div>
+                                <div class="section-title">Patient Queries</div>
+                                <div class="section-sub">Review, assign AI suggestions, and respond</div>
+                            </div>
+                            <div class="filter-row">
+                                <button class="filter-btn active" onclick="filterQueries('all',this)">All</button>
+                                <button class="filter-btn" onclick="filterQueries('high',this)">🔴 High</button>
+                                <button class="filter-btn" onclick="filterQueries('medium',this)">🟡 Medium</button>
+                                <button class="filter-btn" onclick="filterQueries('low',this)">🟢 Low</button>
+                            </div>
+                        </div>
+                        <div id="incomingQueriesContainer"></div>
+                    </div>
+
+                    <!-- Query Detail View -->
+                    <div id="queryDetailPanel" style="display:none;">
+                        <div class="back-btn" onclick="window.AIResponse.closeQueryDetail()"><i
+                                class="fas fa-arrow-left"></i> Back to Queries</div>
+                        <div class="query-detail-split">
+                            <div class="card">
+                                <h3 style="margin-bottom:14px;font-size:1rem;"><i class="fas fa-file-medical"
+                                        style="color:var(--primary);margin-right:6px;"></i>Patient Query</h3>
+                                <div class="detail-field">
+                                    <div class="lbl">Name</div>
+                                    <div class="val" id="detail-name">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Email</div>
+                                    <div class="val" id="detail-email">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Phone</div>
+                                    <div class="val" id="detail-phone">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Department</div>
+                                    <div class="val" id="detail-dept">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Urgency</div>
+                                    <div class="val" id="detail-urgency">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Category</div>
+                                    <div class="val" id="detail-category">—</div>
+                                </div>
+                                <div class="detail-field">
+                                    <div class="lbl">Symptoms</div>
+                                    <div class="val" id="detail-symptoms">—</div>
+                                </div>
+                                <div class="detail-field" style="border:none;">
+                                    <div class="lbl">Message</div>
+                                    <div class="val" id="detail-message" style="white-space:pre-wrap;margin-top:6px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h3 style="margin-bottom:14px;font-size:1rem;"><i class="fas fa-robot"
+                                        style="color:var(--primary);margin-right:6px;"></i>AI Suggested Response</h3>
+                                <div class="ai-notice">
+                                    <span>🤖</span>
+                                    <div><strong>AI-generated draft.</strong> Staff review required before sending.
+                                    </div>
+                                </div>
+                                <div id="aiResponseMeta"
+                                    style="display:none;font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;padding:6px 8px;background:var(--bg);border-radius:6px;">
+                                </div>
+                                <textarea class="ai-textarea" id="aiResponseTextarea"
+                                    placeholder="Click 'Generate AI Suggestion' to get a draft response..."></textarea>
+                                <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                                    <button class="btn btn-warning btn-sm" id="generateBtn"
+                                        onclick="generateForCurrent()"><i class="fas fa-robot"></i> Generate AI
+                                        Suggestion</button>
+                                    <button class="btn btn-success btn-sm"
+                                        onclick="window.AIResponse.approveResponse()"><i class="fas fa-check"></i>
+                                        Approve &amp; Send</button>
+                                    <button class="btn btn-ghost btn-sm"
+                                        onclick="document.getElementById('aiResponseTextarea').value=''"><i
+                                            class="fas fa-trash"></i> Discard</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================= APPOINTMENTS ============================= -->
+                <section class="section-panel" id="sec-appointments">
+                    <div class="section-hdr flex-between">
+                        <div>
+                            <div class="section-title">Appointments</div>
+                            <div class="section-sub">Manage scheduled and pending appointments</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openAddApptModal()"><i class="fas fa-plus"></i>
+                            Add
+                            Appointment</button>
+                    </div>
+                    <div class="card">
+                        <table class="appt-table" id="apptTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Patient</th>
+                                    <th>Department</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>No-Show Risk</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="apptTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ============================= WORKFLOW ============================= -->
+                <section class="section-panel" id="sec-workflow">
+                    <div class="section-hdr flex-between">
+                        <div>
+                            <div class="section-title">Workflow Manager</div>
+                            <div class="section-sub">Track inter-department request routing</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openWorkflowModal()"><i class="fas fa-plus"></i>
+                            New Request</button>
+                    </div>
+                    <div id="workflowBoard"></div>
+                </section>
+
+                <!-- ============================= AI RESPONDER ============================= -->
+                <section class="section-panel" id="sec-ai-responder">
+                    <div class="section-hdr">
+                        <div class="section-title">AI Response Assistant</div>
+                        <div class="section-sub">Generate, review, and approve AI-drafted responses to patient queries
+                        </div>
+                    </div>
+                    <div class="ai-layout">
+                        <div class="card">
+                            <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-pen"
+                                    style="color:var(--primary);margin-right:6px;"></i>Generate Response</h3>
+                            <div class="form-group">
+                                <label>Patient Query</label>
+                                <textarea class="form-control" id="manualQuery" rows="5"
+                                    placeholder="Paste or type patient's query here..."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <select class="form-control" id="manualDept">
+                                        <option>General Medicine</option>
+                                        <option>Cardiology</option>
+                                        <option>Neurology</option>
+                                        <option>Orthopedics</option>
+                                        <option>Dermatology</option>
+                                        <option>Pediatrics</option>
+                                        <option>Emergency</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tone</label>
+                                    <select class="form-control" id="aiTone">
+                                        <option value="professional">Professional</option>
+                                        <option value="empathetic">Empathetic</option>
+                                        <option value="concise">Concise</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-full" onclick="generateManualAI()"><i
+                                    class="fas fa-robot"></i> Generate AI Draft</button>
+                        </div>
+                        <div class="card">
+                            <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-edit"
+                                    style="color:var(--primary);margin-right:6px;"></i>AI Draft Response</h3>
+                            <div class="ai-notice">
+                                <span>🤖</span>
+                                <div><strong>AI-generated draft.</strong> Review before using.</div>
+                            </div>
+                            <textarea class="ai-textarea" id="manualResponseText"
+                                placeholder="AI response will appear here..." style="min-height:220px;"></textarea>
+                            <div style="display:flex;gap:8px;margin-top:10px;">
+                                <button class="btn btn-ghost btn-sm" onclick="copyAIResponse()"><i
+                                        class="fas fa-copy"></i> Copy</button>
+                                <button class="btn btn-success btn-sm w-full" onclick="saveManualResponse()"><i
+                                        class="fas fa-check"></i> Approve &amp; Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top:20px;">
+                        <div class="card-header"><span class="card-title">Response History</span></div>
+                        <div id="responseHistoryContainer"></div>
+                    </div>
+                </section>
+
+                <!-- ============================= CDSS ============================= -->
+                <section class="section-panel" id="sec-cdss">
+                    <div class="section-hdr">
+                        <div class="section-title">Clinical Decision Support System</div>
+                        <div class="section-sub">AI-powered rule engine for patient risk analysis, drug interactions,
+                            and department routing</div>
+                    </div>
+                    <div class="cdss-layout">
+                        <div class="card">
+                            <h3 style="font-size:1rem;margin-bottom:18px;"><i class="fas fa-clipboard-list"
+                                    style="color:var(--primary);margin-right:6px;"></i>Patient Vitals &amp; Data</h3>
+                            <div class="form-row">
+                                <div class="form-group"><label>Patient Name</label><input class="form-control"
+                                        id="cdss-name" placeholder="Full name"></div>
+                                <div class="form-group"><label>Age</label><input type="number" class="form-control"
+                                        id="cdss-age" placeholder="Years" min="0" max="120"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Systolic BP <small>(mmHg)</small></label><input
+                                        type="number" class="form-control" id="cdss-systolic" placeholder="e.g. 120">
+                                </div>
+                                <div class="form-group"><label>Diastolic BP <small>(mmHg)</small></label><input
+                                        type="number" class="form-control" id="cdss-diastolic" placeholder="e.g. 80">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Heart Rate <small>(BPM)</small></label><input
+                                        type="number" class="form-control" id="cdss-hr" placeholder="e.g. 72"></div>
+                                <div class="form-group"><label>Blood Sugar <small>(mg/dL)</small></label><input
+                                        type="number" class="form-control" id="cdss-sugar" placeholder="e.g. 100"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Temperature <small>(°F)</small></label><input
+                                        type="number" class="form-control" id="cdss-temp" placeholder="e.g. 98.6"
+                                        step="0.1"></div>
+                                <div class="form-group"><label>Oxygen SpO₂ <small>(%)</small></label><input
+                                        type="number" class="form-control" id="cdss-o2" placeholder="e.g. 98" min="0"
+                                        max="100"></div>
+                            </div>
+                            <div class="form-group"><label>Symptoms</label><textarea class="form-control"
+                                    id="cdss-symptoms" rows="3"
+                                    placeholder="e.g. chest pain, shortness of breath, fever..."></textarea></div>
+                            <div class="form-group"><label>Current Medications</label><input class="form-control"
+                                    id="cdss-meds" placeholder="e.g. warfarin, aspirin, metformin"></div>
+                            <button class="btn btn-primary w-full" style="margin-top:8px;"
+                                onclick="runCDSSAnalysis()"><i class="fas fa-brain"></i> Analyze Patient Data</button>
+                        </div>
+                        <div>
+                            <div id="cdssResultContainer">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">🩺</div>
+                                    <h3>Enter Patient Vitals</h3>
+                                    <p>Fill in the form and click "Analyze" to see clinical recommendations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================= PATIENT PORTAL ============================= -->
+                <section class="section-panel" id="sec-patient">
+                    <div class="section-hdr">
+                        <div class="section-title">Patient Services</div>
+                        <div class="section-sub">Submit medical queries and request appointments</div>
+                    </div>
+
+                    <!-- Tab Bar -->
+                    <div class="tab-bar">
+                        <button class="tab-btn active" id="tab-query" onclick="window.PatientPortal.switchTab('query')">
+                            <i class="fas fa-comment-medical"></i> Medical Query
+                        </button>
+                        <button class="tab-btn" id="tab-appt" onclick="window.PatientPortal.switchTab('appt')">
+                            <i class="fas fa-calendar-plus"></i> Appointment
+                        </button>
+                    </div>
+
+                    <!-- Forms Container -->
+                    <div class="portal-container">
+                        <!-- Query Form -->
+                        <div id="queryPanel" class="form-card">
+                            <div id="queryForm">
+                                <div class="form-card-header">
+                                    <h3><i class="fas fa-comment-medical"
+                                            style="color:var(--primary);margin-right:8px;"></i>Submit Medical Query</h3>
+                                    <p>Describe your symptoms. Our staff will review and respond within 2-4 hours.</p>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Full Name *</label><input type="text"
+                                            class="form-control" id="q-name" required></div>
+                                    <div class="form-group"><label>Phone Number</label><input type="tel"
+                                            class="form-control" id="q-phone"></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Email</label><input type="email" class="form-control"
+                                            id="q-email"></div>
+                                    <div class="form-group"><label>Age</label><input type="number" class="form-control"
+                                            id="q-age"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Department *</label>
+                                    <select class="form-control" id="q-dept">
+                                        <option value="">Select department...</option>
+                                        <option value="General Medicine">General Medicine</option>
+                                        <option value="Emergency">Emergency</option>
+                                        <option value="Cardiology">Cardiology</option>
+                                        <option value="Neurology">Neurology</option>
+                                        <option value="Orthopedics">Orthopedics</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Urgency</label>
+                                    <div class="urgency-grid" style="margin-top:8px;">
+                                        <button class="urgency-pill low selected"
+                                            onclick="window.PatientPortal.selectUrgency('low', this)">🟢 Low</button>
+                                        <button class="urgency-pill medium"
+                                            onclick="window.PatientPortal.selectUrgency('medium', this)">🟡
+                                            Medium</button>
+                                        <button class="urgency-pill high"
+                                            onclick="window.PatientPortal.selectUrgency('high', this)">🔴 High</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Common Symptoms</label>
+                                    <div class="symptom-chips">
+                                        <span class="symptom-chip"
+                                            onclick="window.PatientPortal.toggleChip(this)">Fever</span>
+                                        <span class="symptom-chip"
+                                            onclick="window.PatientPortal.toggleChip(this)">Headache</span>
+                                        <span class="symptom-chip" onclick="window.PatientPortal.toggleChip(this)">Chest
+                                            Pain</span>
+                                        <span class="symptom-chip"
+                                            onclick="window.PatientPortal.toggleChip(this)">Cough</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Message *</label>
+                                    <textarea class="form-control" id="q-message" rows="4"></textarea>
+                                </div>
+                                <button class="btn btn-primary w-full"
+                                    onclick="window.PatientPortal.submitQuery()">Submit Query</button>
+                            </div>
+                            <div class="success-panel" id="querySuccess">
+                                <div class="success-icon"><i class="fas fa-check"></i></div>
+                                <h3>Submitted!</h3>
+                                <p>Tracking ID: <span id="queryTrackingId"></span></p>
+                                <button class="btn btn-ghost mt-2" onclick="window.PatientPortal.resetQueryForm()">New
+                                    Query</button>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Form -->
+                        <div id="apptPanel" class="form-card" style="display:none;">
+                            <div id="apptForm">
+                                <div class="form-card-header">
+                                    <h3><i class="fas fa-calendar-plus"
+                                            style="color:var(--primary);margin-right:8px;"></i>Request Appointment</h3>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Full Name *</label><input type="text"
+                                            class="form-control" id="a-name" required></div>
+                                    <div class="form-group"><label>Phone *</label><input type="tel" class="form-control"
+                                            id="a-phone" required></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Email</label><input type="email" class="form-control"
+                                            id="a-email"></div>
+                                    <div class="form-group"><label>DOB</label><input type="date" class="form-control"
+                                            id="a-dob"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Department *</label>
+                                    <select class="form-control" id="a-dept">
+                                        <option value="">Select department...</option>
+                                        <option value="General Medicine">General Medicine</option>
+                                        <option value="Cardiology">Cardiology</option>
+                                        <option value="Neurology">Neurology</option>
+                                        <option value="Orthopedics">Orthopedics</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label>Date *</label><input type="date" class="form-control"
+                                            id="a-date"></div>
+                                    <div class="form-group">
+                                        <label>Time</label>
+                                        <select class="form-control" id="a-time">
+                                            <option>Morning</option>
+                                            <option>Afternoon</option>
+                                            <option>Evening</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group"><label>Reason</label><textarea class="form-control"
+                                        id="a-reason" rows="2"></textarea></div>
+                                <button class="btn btn-primary w-full"
+                                    onclick="window.PatientPortal.submitAppointment()">Request Appointment</button>
+                            </div>
+                            <div class="success-panel" id="apptSuccess">
+                                <div class="success-icon"><i class="fas fa-calendar-check"></i></div>
+                                <h3>Requested!</h3>
+                                <p>Tracking ID: <span id="apptTrackingId"></span></p>
+                                <button class="btn btn-ghost mt-2" onclick="window.PatientPortal.resetApptForm()">New
+                                    Appointment</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================= SETTINGS ============================= -->
+                <section class="section-panel" id="sec-settings">
+                    <div class="section-hdr">
+                        <div class="section-title">Platform Settings</div>
+                        <div class="section-sub">Configure AI, Firebase, and alert thresholds</div>
+                    </div>
+                    <div class="settings-grid">
+
+                        <div class="settings-card">
+                            <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-bell"
+                                    style="color:#E74C3C;margin-right:6px;"></i>Alert Thresholds</h3>
+                            <div class="form-group"><label>Max Wait Time (min)</label>
+                                <input type="number" class="form-control" id="thresholdWait" value="30">
+                            </div>
+                            <div class="form-group"><label>Min Bed Availability</label>
+                                <input type="number" class="form-control" id="thresholdBeds" value="20">
+                            </div>
+                            <div class="form-group"><label>Min Efficiency Score</label>
+                                <input type="number" class="form-control" id="thresholdEff" value="50">
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="saveThresholds()"><i
+                                    class="fas fa-save"></i> Save Thresholds</button>
+                        </div>
+                        <div class="settings-card">
+                            <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-database"
+                                    style="color:#8b5cf6;margin-right:6px;"></i>Firebase Config</h3>
+                            <div class="form-group"><label>Hospital ID</label>
+                                <input class="form-control" id="settingsHospitalId" placeholder="hospital_abc">
+                            </div>
+                        </div>
+                        <div class="settings-card">
+                            <h3 style="font-size:1rem;margin-bottom:14px;"><i class="fas fa-user"
+                                    style="color:#4CD137;margin-right:6px;"></i>Account</h3>
+                            <div class="form-group"><label>Display Name</label><input class="form-control"
+                                    id="settingsName" placeholder="Your name"></div>
+                            <div class="form-group"><label>Role</label>
+                                <select class="form-control" id="settingsRole">
+                                    <option>Administrator</option>
+                                    <option>Doctor</option>
+                                    <option>Staff</option>
+                                    <option>Analyst</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="saveAccount()"><i class="fas fa-save"></i>
+                                Save Account</button>
+                            <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+                            <button class="btn btn-danger btn-sm w-full" onclick="handleSignOut()"><i
+                                    class="fas fa-sign-out-alt"></i> Sign Out</button>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /content-area -->
+        </div><!-- /main-area -->
+    </div><!-- /app-layout -->
+
+    <!-- New Workflow Modal -->
+    <div class="modal-overlay" id="newWorkflowModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 style="font-size:1rem;">New Department Request</h3>
+                <button class="modal-close" onclick="closeWorkflowModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-group">
+                <label>Patient Name</label>
+                <input class="form-control" id="wfInputName" placeholder="e.g. Rahul Sharma">
+            </div>
+            <div class="form-group">
+                <label>Target Department</label>
+                <select class="form-control" id="wfInputDept">
+                    <option>Cardiology</option>
+                    <option>Laboratory</option>
+                    <option>Pharmacy</option>
+                    <option>Radiology</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Assign To (Optional)</label>
+                <input class="form-control" id="wfInputStaff" placeholder="e.g. Dr. Available">
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select class="form-control" id="wfInputPriority">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control" id="wfInputDesc" rows="3"
+                    placeholder="Details of the request..."></textarea>
+            </div>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="submitWorkflowRequest()">Create
+                Request</button>
+        </div>
+    </div>
+
+    <!-- Add Appointment Modal -->
+    <div class="modal-overlay" id="addApptModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 style="font-size:1rem;"><i class="fas fa-calendar-plus"
+                        style="margin-right:6px; color:var(--primary);"></i>Add Appointment</h3>
+                <button class="modal-close" onclick="closeAddApptModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="form-group">
+                <label>Patient Full Name *</label>
+                <input class="form-control" id="apptInputName" placeholder="e.g. Priya Sharma">
+            </div>
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" class="form-control" id="apptInputPhone" placeholder="e.g. 9876543210">
+            </div>
+            <div class="form-group">
+                <label>Department *</label>
+                <select class="form-control" id="apptInputDept">
+                    <option value="">Select Department...</option>
+                    <option>Cardiology</option>
+                    <option>Neurology</option>
+                    <option>Orthopedics</option>
+                    <option>Dermatology</option>
+                    <option>General Medicine</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date *</label>
+                    <input type="date" class="form-control" id="apptInputDate">
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <select class="form-control" id="apptInputTime">
+                        <option>Morning</option>
+                        <option>Afternoon</option>
+                        <option>Evening</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>No-Show Risk Analysis</label>
+                <select class="form-control" id="apptInputRisk">
+                    <option value="Low">Low Risk</option>
+                    <option value="Medium">Medium Risk</option>
+                    <option value="High">High Risk</option>
+                </select>
+            </div>
+            <button class="btn btn-primary w-full" style="margin-top:10px;" onclick="submitNewAppt()">Add
+                Appointment</button>
+        </div>
+    </div>
+
+    <!-- Workflow Detail Modal -->
+    <div class="modal-overlay" id="workflowDetailModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 style="font-size:1rem;">Request Details — <span id="wf-detail-id"></span></h3>
+                <button class="modal-close"
+                    onclick="document.getElementById('workflowDetailModal').style.display='none'"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="detail-field">
+                <div class="lbl">Patient</div>
+                <div class="val" id="wf-detail-patient"></div>
+            </div>
+            <div class="detail-field">
+                <div class="lbl">Department</div>
+                <div class="val" id="wf-detail-dept"></div>
+            </div>
+            <div class="detail-field">
+                <div class="lbl">Assigned To</div>
+                <div class="val" id="wf-detail-staff"></div>
+            </div>
+            <div class="detail-field">
+                <div class="lbl">Status</div>
+                <div class="val" id="wf-detail-status"></div>
+            </div>
+            <div class="detail-field">
+                <div class="lbl">Stage</div>
+                <div class="val" id="wf-detail-stage"></div>
+            </div>
+            <div class="detail-field" style="border:none;">
+                <div class="lbl">Description</div>
+                <div class="val" id="wf-detail-desc" style="margin-top:4px;"></div>
+            </div>
+            <div style="margin-top:14px;">
+                <div class="lbl" style="font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:8px;">
+                    TIMELINE</div>
+                <div id="wf-detail-timeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="../services/firebase.js"></script>
+    <script src="../services/gemini.js"></script>
+    <script src="../modules/analytics/analytics.js"></script>
+    <script src="../modules/alerts/alerts.js"></script>
+    <script src="../modules/prediction/predict.js"></script>
+    <script src="../modules/ai-response/ai-response.js"></script>
+    <script src="../modules/workflow/workflow.js"></script>
+    <script src="../modules/cdss/cdss.js"></script>
+    <script src="../modules/patient-system/patient-system.js"></script>
+    <script src="../modules/patient-portal/patient-portal.js"></script>
+
+    <script>
+        // ── Section Navigation ────────────────────────────────────────
+        const SECTION_TITLES = {
+            'dashboard': 'Dashboard', 'analytics': 'Analytics & Insights', 'alerts': 'Smart Alert Engine',
+            'queries': 'Patient Queries', 'appointments': 'Appointments', 'workflow': 'Workflow Manager',
+            'ai-responder': 'AI Response Assistant', 'cdss': 'Clinical CDSS', 'settings': 'Settings', 'patient': 'Patient Portal'
+        };
+
+        function switchSection(name, el) {
+            document.querySelectorAll('.section-panel').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+            const sec = document.getElementById('sec-' + name);
+            if (sec) sec.classList.add('active');
+            if (el) el.classList.add('active');
+            document.getElementById('pageTitle').textContent = SECTION_TITLES[name] || name;
+            if (name === 'workflow') window.Workflow?.renderWorkflow?.();
+            if (name === 'queries') { window.AIResponse?.renderQueryList?.(); document.getElementById('queryDetailPanel').style.display = 'none'; document.getElementById('incomingListView').style.display = 'block'; }
+            if (name === 'ai-responder') window.AIResponse?.renderResponseHistory?.();
+            if (name === 'analytics') initAnalyticsSection();
+        }
+
+        // ── Sidebar Toggle ────────────────────────────────────────────
+        let sidebarCollapsed = false;
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+            document.getElementById('toggleIcon').className = sidebarCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+        }
+        function openMobileSidebar() { document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('sidebarOverlay').classList.add('active'); }
+        function closeMobileSidebar() { document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+
+        // ── Theme Toggle ──────────────────────────────────────────────
+        let isDark = false;
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeIcon').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            setTimeout(() => window.Analytics?.initCharts?.(), 100);
+        }
+
+        // ── Toast ─────────────────────────────────────────────────────
+        window.showToast = function (msg, type = 'info') {
+            const tc = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+            el.className = `toast ${type}`;
+            el.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i><span>${msg}</span>`;
+            tc.appendChild(el);
+            setTimeout(() => { el.classList.add('toast-out'); setTimeout(() => el.remove(), 300); }, 3500);
+        };
+
+        // ── Queries ───────────────────────────────────────────────────
+        function filterQueries(level, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            window.AIResponse?.renderQueryList?.(level);
+        }
+        function generateForCurrent() {
+            const q = window.AIResponse?._currentQuery;
+            if (q) window.AIResponse.generateSuggestion(q.message, q.department);
+            else showToast('No query selected.', 'warning');
+        }
+
+        // ── Appointments ──────────────────────────────────────────────
+        function renderAppointments() {
+            const tbody = document.getElementById('apptTableBody');
+            if (!tbody) return;
+            const appts = JSON.parse(localStorage.getItem('demo_appointments') || '[]');
+            const riskBadge = r => r === 'High' ? 'badge-critical' : r === 'Medium' ? 'badge-warning' : 'badge-success';
+            const statusBadge = s => (s === 'confirmed' || s === 'completed') ? 'badge-success' : s === 'discharged' ? 'badge-muted' : 'badge-muted';
+
+            if (appts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">No appointments scheduled.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appts.map(a => `
+    <tr>
+      <td style="font-family:monospace;font-size:0.8rem;color:var(--text-muted);">${a.id}</td>
+      <td><strong>${a.name}</strong></td>
+      <td>${a.department}</td>
+      <td>${a.date}</td>
+      <td>${a.time}</td>
+      <td><span class="badge ${statusBadge(a.status)}">${a.status}</span></td>
+      <td><span class="badge ${riskBadge(a.noShowRisk)}">${a.noShowRisk}</span></td>
+      <td>
+        ${a.status !== 'completed' && a.status !== 'discharged' ? `<button class="btn btn-success btn-sm" style="padding:4px 8px;margin-right:4px;" onclick="completeAppt('${a.id}')"><i class="fas fa-check"></i></button>` : ''}
+        ${a.status !== 'discharged' && a.status !== 'completed' ? `<button class="btn btn-ghost btn-sm" style="padding:4px 8px;" onclick="dischargeAppt('${a.id}')">Discharge</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+        }
+
+        function openAddApptModal() {
+            document.getElementById('addApptModal').style.display = 'flex';
+        }
+
+        function closeAddApptModal() {
+            document.getElementById('addApptModal').style.display = 'none';
+        }
+
+        function submitNewAppt() {
+            const name = document.getElementById('apptInputName').value.trim();
+            const phone = document.getElementById('apptInputPhone').value.trim();
+            const dept = document.getElementById('apptInputDept').value;
+            const date = document.getElementById('apptInputDate').value;
+            const time = document.getElementById('apptInputTime').value;
+            const risk = document.getElementById('apptInputRisk').value || 'Low';
+
+            if (!name || !phone || !dept || !date) { showToast('Please fill all required fields.', 'warning'); return; }
+
+            const a = {
+                id: 'APT-' + (Math.floor(Math.random() * 900) + 100),
+                name: name,
+                department: dept,
+                date: date,
+                time: time || 'Morning',
+                status: 'pending',
+                noShowRisk: risk
+            };
+            const saved = JSON.parse(localStorage.getItem('demo_appointments') || '[]');
+            saved.unshift(a);
+            localStorage.setItem('demo_appointments', JSON.stringify(saved));
+
+            renderAppointments();
+            closeAddApptModal();
+            showToast('New appointment added ✓', 'success');
+
+            // Clear fields
+            document.getElementById('apptInputName').value = '';
+            document.getElementById('apptInputPhone').value = '';
+            document.getElementById('apptInputDate').value = '';
+        }
+
+        function completeAppt(id) {
+            const appts = JSON.parse(localStorage.getItem('demo_appointments') || '[]');
+            const idx = appts.findIndex(a => a.id === id);
+            if (idx > -1) {
+                appts[idx].status = 'completed';
+                localStorage.setItem('demo_appointments', JSON.stringify(appts));
+                renderAppointments();
+                showToast('Appointment marked as completed ✓', 'success');
+            }
+        }
+
+        function dischargeAppt(id) {
+            const appts = JSON.parse(localStorage.getItem('demo_appointments') || '[]');
+            const idx = appts.findIndex(a => a.id === id);
+            if (idx > -1) {
+                appts[idx].status = 'discharged';
+                localStorage.setItem('demo_appointments', JSON.stringify(appts));
+                renderAppointments();
+                showToast('Patient discharged successfully.', 'success');
+            }
+        }
+
+        // ── AI Responder (manual) ─────────────────────────────────────
+        async function generateManualAI() {
+            const query = document.getElementById('manualQuery').value.trim();
+            const dept = document.getElementById('manualDept').value;
+            if (!query) { showToast('Enter a patient query first.', 'warning'); return; }
+            const area = document.getElementById('manualResponseText');
+            area.value = 'Generating AI draft...';
+            const result = await window.GeminiService.generateAIResponse(query, dept);
+            area.value = result.suggested_reply;
+            showToast('AI draft generated ✓', 'success');
+        }
+
+        function copyAIResponse() {
+            const text = document.getElementById('manualResponseText').value;
+            if (text) { navigator.clipboard.writeText(text); showToast('Copied to clipboard ✓', 'success'); }
+        }
+
+        function saveManualResponse() {
+            const text = document.getElementById('manualResponseText').value.trim();
+            if (!text) { showToast('No response to save.', 'warning'); return; }
+            const saved = JSON.parse(localStorage.getItem('demo_responses') || '[]');
+            saved.unshift({ patientName: 'Manual Entry', department: document.getElementById('manualDept').value, response: text, createdAt: new Date().toISOString() });
+            localStorage.setItem('demo_responses', JSON.stringify(saved));
+            showToast('Response saved to history ✓', 'success');
+            window.AIResponse?.renderResponseHistory?.();
+        }
+
+        // ── CDSS ──────────────────────────────────────────────────────
+        function runCDSSAnalysis() {
+            const vitals = {
+                name: document.getElementById('cdss-name').value,
+                age: document.getElementById('cdss-age').value,
+                systolic: document.getElementById('cdss-systolic').value,
+                diastolic: document.getElementById('cdss-diastolic').value,
+                heartRate: document.getElementById('cdss-hr').value,
+                bloodSugar: document.getElementById('cdss-sugar').value,
+                temperature: document.getElementById('cdss-temp').value,
+                oxygenLevel: document.getElementById('cdss-o2').value,
+                symptoms: document.getElementById('cdss-symptoms').value,
+                medications: document.getElementById('cdss-meds').value,
+            };
+            const result = window.CDSS?.runCDSS?.(vitals);
+            if (result) { result._vitals = vitals; window.CDSS.renderCDSS(result); }
+        }
+
+        // ── Settings ──────────────────────────────────────────────────
+        function saveGeminiSettings() {
+
+            showToast('AI settings saved ✓', 'success');
+        }
+        function saveThresholds() { showToast('Alert thresholds saved ✓', 'success'); }
+        function saveAccount() {
+            const name = document.getElementById('settingsName').value;
+            const role = document.getElementById('settingsRole').value;
+            if (name) { localStorage.setItem('userName', name); updateUserInfo(); }
+            if (role) localStorage.setItem('userRole', role);
+            showToast('Account settings saved ✓', 'success');
+        }
+        function handleSignOut() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // ── Workflow helpers ──────────────────────────────────────────
+        function openWorkflowModal() {
+            document.getElementById('newWorkflowModal').style.display = 'flex';
+        }
+        function closeWorkflowModal() {
+            document.getElementById('newWorkflowModal').style.display = 'none';
+        }
+        function submitWorkflowRequest() {
+            const name = document.getElementById('wfInputName').value.trim();
+            const dept = document.getElementById('wfInputDept').value;
+            const staff = document.getElementById('wfInputStaff').value.trim() || 'Unassigned';
+            const pri = document.getElementById('wfInputPriority').value;
+            const desc = document.getElementById('wfInputDesc').value.trim();
+
+            if (!name || !desc) { showToast('Please enter patient name and description.', 'warning'); return; }
+
+            window.Workflow?.createRequest?.({
+                patientName: name,
+                department: dept,
+                assignedTo: staff, priority: pri,
+                description: desc
+            });
+
+            closeWorkflowModal();
+            // Clear fields
+            document.getElementById('wfInputName').value = '';
+            document.getElementById('wfInputDesc').value = '';
+        }
+
+
+
+        // ── Realtime Firestore listener ───────────────────────────────
+        function initFirestoreListener() {
+            const fallback = () => {
+                console.log('⚠️ Firestore unavailable – using local demo data');
+                window.Analytics?.renderKpiCards?.();
+                window.Analytics?.initCharts?.();
+                window.Analytics?.renderEfficiencyGauge?.();
+                window.Alerts?.loadDemoAlerts?.();
+                window.Predictions?.renderPredictions?.();
+            };
+            try {
+                const ref = window.FirebaseService?.getHospitalRef?.();
+                if (!ref) throw new Error('no ref');
+                ref.orderBy('createdAt', 'asc').onSnapshot(snap => {
+                    console.log('✅ Firestore connected – loaded', snap.docs.length, 'records');
+                    const records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    window.Analytics?.updateAnalyticsFromRecords?.(records);
+                    window.Predictions?.updatePredictionsFromRecords?.(records);
+                    const m = window.Analytics?.MOCK_METRICS || {};
+                    window.Alerts?.checkAlerts?.({ avgWait: m.avgWaitTime || 28, beds: m.bedsAvailable || 67, score: m.efficiencyScore || 82 });
+                }, err => {
+                    console.warn('⚠️ Firestore permission denied – switching to local demo data');
+                    fallback();
+                });
+            } catch (e) {
+                fallback();
+            }
+        }
+
+        // Sync alerts to second container (Alerts section)
+        function syncAlertsContainers() {
+            const c1 = document.getElementById('alertsContainer');
+            const c2 = document.getElementById('alertsContainer2');
+            if (c1 && c2) {
+                const obs = new MutationObserver(() => { if (c1.innerHTML) c2.innerHTML = c1.innerHTML; });
+                obs.observe(c1, { childList: true, subtree: true });
+            }
+        }
+
+        function initAnalyticsSection() {
+            const c2 = document.getElementById('patientsChart2')?.getContext('2d');
+            const w2 = document.getElementById('waitTimeChart2')?.getContext('2d');
+            if (c2 && !c2._done) {
+                const cols = window.Analytics?.MOCK_DEPT_DATA || [];
+                new Chart(c2, {
+                    type: 'bar', data: { labels: cols.map(d => d.dept), datasets: [{ label: 'Patients', data: cols.map(d => d.count), backgroundColor: ['#2E86DE', '#4CD137', '#F39C12', '#E74C3C', '#8b5cf6', '#06b6d4'], borderRadius: 8 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true } } }
+                });
+                c2._done = true;
+            }
+            if (w2 && !w2._done) {
+                const wt = [18, 22, 31, 28, 25, 33, 29, 26, 34, 28, 24, 30, 27, 28, 26];
+                new Chart(w2, {
+                    type: 'line', data: { labels: wt.map((_, i) => `${i + 1}h`), datasets: [{ label: 'Wait (min)', data: wt, borderColor: '#F39C12', backgroundColor: 'rgba(243,156,18,0.08)', fill: true, tension: 0.4, pointRadius: 3 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+                w2._done = true;
+            }
+            window.Predictions?.renderPredictions?.();
+        }
+
+        // ── User info ─────────────────────────────────────────────────
+        function updateUserInfo() {
+            const name = localStorage.getItem('userName') || 'Admin';
+            const role = localStorage.getItem('userRole') || 'Administrator';
+            const init = (name.charAt(0) + (name.includes(' ') ? name.split(' ')[1]?.charAt(0) : '')).toUpperCase().substring(0, 2);
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userRole').textContent = role;
+            document.getElementById('userAvatar').textContent = init || 'AD';
+            document.getElementById('headerAvatar').textContent = init || 'AD';
+            document.getElementById('settingsName').value = name;
+            document.getElementById('settingsRole').value = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            document.getElementById('settingsHospitalId').value = localStorage.getItem('hospitalId') || 'demo_hospital';
+
+
+            // Adjust sidebar based on role
+            if (role.toLowerCase() === 'patient') {
+                document.querySelectorAll('.sidebar-nav-item').forEach(el => {
+                    if (el.getAttribute('data-section') !== 'patient') el.style.display = 'none';
+                });
+                document.querySelectorAll('.sidebar-section-label').forEach(el => el.style.display = 'none');
+                const navPatient = document.getElementById('navPatient');
+                navPatient.style.display = 'flex';
+                switchSection('patient', navPatient);
+
+                // Hide header actions irrelevant to patient
+                document.querySelector('.search-wrapper').style.display = 'none';
+            } else {
+                // Admin/Staff sees all, maybe keep Patient Portal visible so they can test it
+            }
+        }
+
+        function refreshAll() {
+            initFirestoreListener();
+            showToast('Dashboard refreshed ✓', 'success');
+        }
+
+        // ── Init ──────────────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            // Restore theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') toggleTheme();
+
+            updateUserInfo();
+            document.getElementById('dashboardTime').textContent = 'Live · ' + new Date().toLocaleString();
+
+            // Show mobile menu button on small screens
+            if (window.innerWidth <= 768) document.getElementById('mobileMenuBtn').style.display = 'block';
+
+            // Init all modules (with delay to let ES modules load)
+            setTimeout(() => {
+                initFirestoreListener();
+                window.AIResponse?.loadQueries?.();
+                window.Workflow?.loadWorkflow?.();
+                syncAlertsContainers();
+                renderAppointments();
+            }, 300);
+        });
+    </script>
+</body>
+
+</html>

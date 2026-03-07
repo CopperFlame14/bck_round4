@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal — AI Hospital Intelligence Platform</title>
+    <meta name="description" content="Submit your medical query or request an appointment at our hospital.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../ui/design-system.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #F0F4FF 0%, #F5F7FA 50%, #EAF4F0 100%);
+            min-height: 100vh;
+        }
+
+        .portal-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .portal-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2E86DE, #4CD137);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .portal-brand h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1A202C;
+        }
+
+        .portal-brand span {
+            font-size: 0.72rem;
+            color: #64748B;
+            display: block;
+        }
+
+        .portal-nav-link {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .portal-nav-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Hero */
+        .portal-hero {
+            text-align: center;
+            padding: 52px 24px 40px;
+        }
+
+        .portal-hero h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1A202C;
+            line-height: 1.25;
+            max-width: 540px;
+            margin: 0 auto 12px;
+        }
+
+        .portal-hero p {
+            color: #64748B;
+            font-size: 1rem;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 5px;
+            max-width: 420px;
+            margin: 24px auto 36px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #64748B;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(46, 134, 222, 0.3);
+        }
+
+        /* Forms container */
+        .portal-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-card-header {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-card-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1A202C;
+        }
+
+        .form-card-header p {
+            color: #64748B;
+            font-size: 0.86rem;
+            margin-top: 4px;
+        }
+
+        /* Urgency selector */
+        .urgency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .urgency-pill {
+            padding: 10px 8px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-strong);
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.18s;
+            color: #64748B;
+        }
+
+        .urgency-pill:hover {
+            border-color: #94A3B8;
+        }
+
+        .urgency-pill.low.selected {
+            border-color: #4CD137;
+            background: rgba(76, 209, 55, 0.08);
+            color: #27ae60;
+        }
+
+        .urgency-pill.medium.selected {
+            border-color: #F39C12;
+            background: rgba(243, 156, 18, 0.08);
+            color: #e67e22;
+        }
+
+        .urgency-pill.high.selected {
+            border-color: #E74C3C;
+            background: rgba(231, 76, 60, 0.08);
+            color: var(--critical);
+        }
+
+        /* Symptom chips */
+        .symptom-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .symptom-chip {
+            padding: 5px 12px;
+            border: 1.5px solid var(--border-strong);
+            border-radius: var(--radius-full);
+            font-size: 0.78rem;
+            cursor: pointer;
+            color: #64748B;
+            transition: all 0.15s;
+            background: white;
+            user-select: none;
+        }
+
+        .symptom-chip.selected {
+            border-color: var(--primary);
+            background: rgba(46, 134, 222, 0.08);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Submit Area */
+        .submit-area {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Success panel */
+        .success-panel {
+            display: none;
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(76, 209, 55, 0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #27ae60;
+            margin: 0 auto 16px;
+        }
+
+        .success-panel h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 8px;
+        }
+
+        .success-panel p {
+            color: #64748B;
+            font-size: 0.9rem;
+            max-width: 340px;
+            margin: 0 auto 24px;
+        }
+
+        .tracking-id {
+            display: inline-block;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 16px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Info strip at bottom */
+        .info-strip {
+            max-width: 680px;
+            margin: 28px auto 0;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .info-item {
+            text-align: center;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-item i {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .info-item h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1A202C;
+            margin-bottom: 4px;
+        }
+
+        .info-item p {
+            font-size: 0.75rem;
+            color: #64748B;
+        }
+
+        @media (max-width: 480px) {
+            .info-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .urgency-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="portal-header">
+        <div class="portal-brand">
+            <div class="portal-brand-icon"><i class="fas fa-heartbeat"></i></div>
+            <div>
+                <h1>AI Hospital Intelligence Platform</h1>
+                <span>Patient Portal</span>
+            </div>
+        </div>
+        <a href="login.html" class="portal-nav-link"><i class="fas fa-user-shield" style="margin-right:5px;"></i>Staff
+            Login</a>
+    </header>
+
+    <!-- Hero -->
+    <div class="portal-hero">
+        <h2>How can we help you today?</h2>
+        <p>Submit a medical query or request an appointment with our specialists.</p>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <button class="tab-btn active" id="tab-query" onclick="switchTab('query')">
+            <i class="fas fa-comment-medical"></i> Medical Query
+        </button>
+        <button class="tab-btn" id="tab-appt" onclick="switchTab('appt')">
+            <i class="fas fa-calendar-plus"></i> Appointment
+        </button>
+    </div>
+
+    <!-- Forms -->
+    <div class="portal-container">
+
+        <!-- ===== QUERY FORM ===== -->
+        <div id="queryPanel" class="form-card">
+            <div id="queryForm">
+                <div class="form-card-header">
+                    <h3><i class="fas fa-comment-medical" style="color:var(--primary);margin-right:8px;"></i>Submit
+                        Medical Query</h3>
+                    <p>Describe your symptoms or health concern. Our staff will review and respond within 2–4 hours.</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span style="color:var(--critical)">*</span></label>
+                        <input type="text" class="form-control" id="q-name" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" class="form-control" id="q-phone" placeholder="+91 XXXXX XXXXX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control" id="q-email" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" class="form-control" id="q-age" placeholder="Age in years" min="1"
+                            max="120">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Department <span style="color:var(--critical)">*</span></label>
+                    <select class="form-control" id="q-dept">
+                        <option value="">Select department...</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Gynecology">Gynecology</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                        <option value="Oncology">Oncology</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Urgency Level</label>
+                    <div class="urgency-grid" style="margin-top:8px;">
+                        <button class="urgency-pill low selected" onclick="selectUrgency('low', this)">🟢
+                            Low<br><small>Non-urgent</small></button>
+                        <button class="urgency-pill medium" onclick="selectUrgency('medium', this)">🟡
+                            Medium<br><small>Needs care soon</small></button>
+                        <button class="urgency-pill high" onclick="selectUrgency('high', this)">🔴
+                            High<br><small>Urgent</small></button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Common Symptoms (tap to select)</label>
+                    <div class="symptom-chips" id="symptomChips">
+                        <span class="symptom-chip" onclick="toggleChip(this)">Fever</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Headache</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Chest Pain</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Shortness of Breath</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Fatigue</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Nausea</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Back Pain</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Dizziness</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Cough</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Rash</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Joint Pain</span>
+                        <span class="symptom-chip" onclick="toggleChip(this)">Stomach Pain</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Describe Your Concern <span style="color:var(--critical)">*</span></label>
+                    <textarea class="form-control" id="q-message" rows="5"
+                        placeholder="Please describe your symptoms, how long you've had them, and any other relevant medical history..."></textarea>
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;" id="charCount">0 / 1000
+                        characters</div>
+                </div>
+
+                <div class="submit-area">
+                    <button class="btn btn-primary btn-lg w-full" onclick="submitQuery()">
+                        <i class="fas fa-paper-plane"></i> Submit Medical Query
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="success-panel" id="querySuccess">
+                <div class="success-icon"><i class="fas fa-check"></i></div>
+                <h3>Query Submitted Successfully!</h3>
+                <p>Our medical staff will review your query and respond within 2–4 hours. Your tracking ID:</p>
+                <div class="tracking-id" id="queryTrackingId">QRY-000000</div>
+                <button class="btn btn-ghost" onclick="resetQueryForm()">Submit Another Query</button>
+            </div>
+        </div>
+
+        <!-- ===== APPOINTMENT FORM ===== -->
+        <div id="apptPanel" class="form-card" style="display:none;">
+            <div id="apptForm">
+                <div class="form-card-header">
+                    <h3><i class="fas fa-calendar-plus" style="color:var(--primary);margin-right:8px;"></i>Request
+                        Appointment</h3>
+                    <p>Book an appointment with our specialists. Our AI system finds the best available slot for you.
+                    </p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span style="color:var(--critical)">*</span></label>
+                        <input type="text" class="form-control" id="a-name" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number <span style="color:var(--critical)">*</span></label>
+                        <input type="tel" class="form-control" id="a-phone" placeholder="+91 XXXXX XXXXX" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control" id="a-email" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" class="form-control" id="a-dob">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Department <span style="color:var(--critical)">*</span></label>
+                    <select class="form-control" id="a-dept">
+                        <option value="">Select department...</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Emergency">Emergency</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Gynecology">Gynecology</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Preferred Date <span style="color:var(--critical)">*</span></label>
+                        <input type="date" class="form-control" id="a-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Time</label>
+                        <select class="form-control" id="a-time">
+                            <option value="Morning (9AM–12PM)">Morning (9AM–12PM)</option>
+                            <option value="Afternoon (12PM–3PM)">Afternoon (12PM–3PM)</option>
+                            <option value="Evening (3PM–6PM)">Evening (3PM–6PM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Reason for Visit</label>
+                    <textarea class="form-control" id="a-reason" rows="3"
+                        placeholder="Briefly describe the reason for your appointment..."></textarea>
+                </div>
+
+                <div class="submit-area">
+                    <button class="btn btn-primary btn-lg w-full" onclick="submitAppointment()">
+                        <i class="fas fa-calendar-check"></i> Request Appointment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="success-panel" id="apptSuccess">
+                <div class="success-icon"><i class="fas fa-calendar-check"></i></div>
+                <h3>Appointment Requested!</h3>
+                <p>Your appointment request has been received. Our scheduling team will confirm within 24 hours. Your
+                    booking reference:</p>
+                <div class="tracking-id" id="apptTrackingId">APT-000000</div>
+                <button class="btn btn-ghost" onclick="resetApptForm()">Book Another Appointment</button>
+            </div>
+        </div>
+
+        <!-- Info Strip -->
+        <div class="info-strip">
+            <div class="info-item">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Secure & Private</h4>
+                <p>Your data is protected with enterprise-grade security</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-robot"></i>
+                <h4>AI-Assisted Review</h4>
+                <p>AI helps staff draft faster, more accurate responses</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <h4>2–4 Hour Response</h4>
+                <p>Medical staff review all queries promptly</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="../services/firebase.js"></script>
+    <script>
+        let selectedUrgency = 'low';
+
+        // Tab switching
+        function switchTab(tab) {
+            document.getElementById('queryPanel').style.display = tab === 'query' ? 'block' : 'none';
+            document.getElementById('apptPanel').style.display = tab === 'appt' ? 'block' : 'none';
+            document.getElementById('tab-query').classList.toggle('active', tab === 'query');
+            document.getElementById('tab-appt').classList.toggle('active', tab === 'appt');
+        }
+
+        // Urgency selection
+        function selectUrgency(level, el) {
+            selectedUrgency = level;
+            document.querySelectorAll('.urgency-pill').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // Symptom chips
+        function toggleChip(el) { el.classList.toggle('selected'); }
+
+        function getSelectedSymptoms() {
+            return Array.from(document.querySelectorAll('.symptom-chip.selected')).map(c => c.textContent).join(', ');
+        }
+
+        // Character count
+        document.getElementById('q-message')?.addEventListener('input', function () {
+            document.getElementById('charCount').textContent = `${this.value.length} / 1000 characters`;
+        });
+
+        // Submit Query
+        async function submitQuery() {
+            const name = document.getElementById('q-name').value.trim();
+            const message = document.getElementById('q-message').value.trim();
+            const dept = document.getElementById('q-dept').value;
+
+            if (!name || !message || !dept) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            const id = 'QRY-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            const data = {
+                id,
+                name,
+                email: document.getElementById('q-email').value.trim(),
+                phone: document.getElementById('q-phone').value.trim(),
+                age: document.getElementById('q-age').value || null,
+                department: dept,
+                urgency: selectedUrgency,
+                symptoms: getSelectedSymptoms(),
+                message,
+                status: 'pending',
+                source: 'patient_portal'
+            };
+
+            try {
+                const ref = window.FirebaseService?.getQueriesRef();
+                if (ref) await window.FirebaseService.addDocument(ref, data);
+            } catch (e) {
+                console.warn('Firestore save failed (demo mode):', e.message);
+            }
+
+            // Save to localStorage for demo
+            const queries = JSON.parse(localStorage.getItem('demo_queries') || '[]');
+            queries.unshift({ ...data, createdAt: new Date().toISOString() });
+            localStorage.setItem('demo_queries', JSON.stringify(queries));
+
+            document.getElementById('queryTrackingId').textContent = id;
+            document.getElementById('queryForm').style.display = 'none';
+            document.getElementById('querySuccess').style.display = 'block';
+            showToast('Query submitted successfully!', 'success');
+        }
+
+        // Submit Appointment
+        async function submitAppointment() {
+            const name = document.getElementById('a-name').value.trim();
+            const phone = document.getElementById('a-phone').value.trim();
+            const dept = document.getElementById('a-dept').value;
+            const date = document.getElementById('a-date').value;
+
+            if (!name || !phone || !dept || !date) {
+                showToast('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            const id = 'APT-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            const data = {
+                id,
+                name, phone,
+                email: document.getElementById('a-email').value.trim(),
+                dob: document.getElementById('a-dob').value,
+                department: dept,
+                date, time: document.getElementById('a-time').value,
+                reason: document.getElementById('a-reason').value.trim(),
+                status: 'pending',
+                source: 'patient_portal',
+                noShowRisk: calcNoShowRisk(date)
+            };
+
+            try {
+                const ref = window.FirebaseService?.getApptsRef();
+                if (ref) await window.FirebaseService.addDocument(ref, data);
+            } catch (e) {
+                console.warn('Firestore save failed (demo mode):', e.message);
+            }
+
+            const appts = JSON.parse(localStorage.getItem('demo_appointments') || '[]');
+            appts.unshift({ ...data, createdAt: new Date().toISOString() });
+            localStorage.setItem('demo_appointments', JSON.stringify(appts));
+
+            document.getElementById('apptTrackingId').textContent = id;
+            document.getElementById('apptForm').style.display = 'none';
+            document.getElementById('apptSuccess').style.display = 'block';
+            showToast('Appointment requested successfully!', 'success');
+        }
+
+        // No-show risk (from bck2 predictor)
+        function calcNoShowRisk(dateStr) {
+            const apptDate = new Date(dateStr);
+            const today = new Date();
+            const daysDiff = Math.ceil((apptDate - today) / (1000 * 60 * 60 * 24));
+            if (daysDiff > 14) return 'High';
+            if (daysDiff > 7) return 'Medium';
+            return 'Low';
+        }
+
+        function resetQueryForm() {
+            document.getElementById('queryForm').style.display = 'block';
+            document.getElementById('querySuccess').style.display = 'none';
+            document.getElementById('q-name').value = '';
+            document.getElementById('q-message').value = '';
+        }
+
+        function resetApptForm() {
+            document.getElementById('apptForm').style.display = 'block';
+            document.getElementById('apptSuccess').style.display = 'none';
+        }
+
+        // Set min date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('a-date').min = today;
+
+        // Toast system
+        function showToast(msg, type = 'info') {
+            const tc = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle', warning: 'exclamation-triangle' };
+            t.className = `toast ${type}`;
+            t.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i><span>${msg}</span>`;
+            tc.appendChild(t);
+            setTimeout(() => { t.classList.add('toast-out'); setTimeout(() => t.remove(), 300); }, 3500);
+        }
+    </script>
+</body>
+
+</html>
