@@ -37,13 +37,26 @@ function getDemoQueries() {
   return JSON.parse(localStorage.getItem('demo_queries') || '[]');
 }
 
+// Infer urgency from message content so list/detail show correct priority before AI Suggest
+function inferUrgencyFromMessage(text) {
+  if (!text || typeof text !== 'string') return null;
+  const q = text.toLowerCase();
+  if (/chest pain|can't breathe|breathing difficulty|shortness of breath|bleeding|unconscious|stroke|heart attack|emergency|severe pain|unbearable|worst pain|critical|urgent/.test(q)) return 'high';
+  if (/persistent|recurring|worsening|several days|past week|concerned|worried|pain|fever|nausea|dizziness/.test(q)) return 'medium';
+  return null;
+}
+
+function getDisplayUrgency(q) {
+  return (q.aiUrgency || inferUrgencyFromMessage(q.message) || q.urgency || 'low').toLowerCase();
+}
+
 // ── Render Query List ─────────────────────────────────────────────
 function renderQueryList(filter = 'all') {
   const container = document.getElementById('incomingQueriesContainer');
   if (!container) return;
 
   let filtered = _queries.filter(q => q.status !== 'resolved');
-  if (filter !== 'all') filtered = filtered.filter(q => q.urgency === filter);
+  if (filter !== 'all') filtered = filtered.filter(q => getDisplayUrgency(q) === filter);
 
   if (filtered.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📬</div><h3>No Queries</h3><p>All caught up! No pending queries.</p></div>`;
@@ -54,6 +67,7 @@ function renderQueryList(filter = 'all') {
   const urgencyBg = { high: 'badge-critical', medium: 'badge-warning', low: 'badge-success' };
 
   container.innerHTML = filtered.map(q => {
+    const urgency = getDisplayUrgency(q);
     const time = q.createdAt?.toDate ? q.createdAt.toDate().toLocaleString() : (q.createdAt ? new Date(q.createdAt).toLocaleString() : '—');
     return `
       <div class="query-card" onclick="window.AIResponse.openQuery('${q.id}')">
@@ -62,7 +76,7 @@ function renderQueryList(filter = 'all') {
             <strong style="color:var(--text-primary);">${q.name || 'Anonymous'}</strong>
             <span style="font-size:0.75rem;color:var(--text-muted);margin-left:6px;">${q.department || 'General'}</span>
           </div>
-          <span class="badge ${urgencyBg[q.urgency] || 'badge-muted'}">${(q.urgency || 'low').toUpperCase()}</span>
+          <span class="badge ${urgencyBg[urgency] || 'badge-muted'}">${urgency.toUpperCase()}</span>
         </div>
         <div class="query-card-body">${(q.message || '').substring(0, 120)}${q.message?.length > 120 ? '...' : ''}</div>
         <div class="query-card-footer">
@@ -101,11 +115,12 @@ function openQuery(id) {
 
     // Populate fields
     const setField = (elId, val) => { const el = document.getElementById(elId); if (el) el.textContent = val || '—'; };
+    const displayUrgency = getDisplayUrgency(q).toUpperCase();
     setField('detail-name', q.name);
     setField('detail-email', q.email);
     setField('detail-phone', q.phone);
     setField('detail-dept', q.department);
-    setField('detail-urgency', q.urgency?.toUpperCase());
+    setField('detail-urgency', displayUrgency);
     setField('detail-category', q.category);
     setField('detail-message', q.message);
     setField('detail-symptoms', q.symptoms || 'Not specified');
@@ -134,6 +149,23 @@ async function generateSuggestion(query, dept) {
   try {
     const result = await window.GeminiService.generateAIResponse(query, dept);
     textarea.value = result.suggested_reply;
+
+    // Use AI-inferred urgency so list and detail stay in sync
+    if (_currentQuery && result.urgency) {
+      _currentQuery.aiUrgency = result.urgency;
+      const idx = _queries.findIndex(q => q.id === _currentQuery.id);
+      if (idx !== -1) _queries[idx].aiUrgency = result.urgency;
+      const el = document.getElementById('detail-urgency');
+      if (el) el.textContent = result.urgency.toUpperCase();
+      // Persist to demo_queries so list shows correct urgency after refresh
+      const demo = JSON.parse(localStorage.getItem('demo_queries') || '[]');
+      const qIdx = demo.findIndex(q => q.id === _currentQuery.id);
+      if (qIdx !== -1) {
+        demo[qIdx].aiUrgency = result.urgency;
+        localStorage.setItem('demo_queries', JSON.stringify(demo));
+      }
+      renderQueryList();
+    }
 
     // Show category/urgency
     const meta = document.getElementById('aiResponseMeta');

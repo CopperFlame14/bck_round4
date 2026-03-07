@@ -2,8 +2,6 @@
  * patient-portal.js — Integrated Patient Portal
  */
 
-let selectedUrgency = 'low';
-
 function switchTab(tab) {
     document.getElementById('queryPanel').style.display = tab === 'query' ? 'block' : 'none';
     document.getElementById('apptPanel').style.display = tab === 'appt' ? 'block' : 'none';
@@ -11,17 +9,9 @@ function switchTab(tab) {
     document.getElementById('tab-appt').classList.toggle('active', tab === 'appt');
 }
 
-function selectUrgency(level, el) {
-    selectedUrgency = level;
-    document.querySelectorAll('.urgency-pill').forEach(p => p.classList.remove('selected'));
-    el.classList.add('selected');
-}
-
 function toggleChip(el) { el.classList.toggle('selected'); }
 
-function getSelectedSymptoms() {
-    return Array.from(document.querySelectorAll('.symptom-chip.selected')).map(c => c.textContent).join(', ');
-}
+function getSelectedSymptoms() { return ''; }
 
 // Character count event listener setup is called in init
 function initPatientPortal() {
@@ -54,7 +44,7 @@ async function submitQuery() {
         phone: document.getElementById('q-phone').value.trim(),
         age: document.getElementById('q-age').value || null,
         department: dept,
-        urgency: selectedUrgency,
+        urgency: 'low',
         symptoms: getSelectedSymptoms(),
         message,
         status: 'pending',
@@ -141,4 +131,4 @@ function resetApptForm() {
     document.getElementById('apptSuccess').style.display = 'none';
 }
 
-window.PatientPortal = { initPatientPortal, switchTab, selectUrgency, toggleChip, submitQuery, submitAppointment, resetQueryForm, resetApptForm };
+window.PatientPortal = { initPatientPortal, switchTab, toggleChip, submitQuery, submitAppointment, resetQueryForm, resetApptForm };

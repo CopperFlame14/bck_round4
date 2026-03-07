@@ -552,23 +552,6 @@
       transform: none;
     }
 
-    /* Demo notice */
-    .demo-notice {
-      margin-top: 20px;
-      padding: 12px 16px;
-      background: rgba(46, 134, 222, 0.06);
-      border: 1px solid rgba(46, 134, 222, 0.12);
-      border-radius: 12px;
-      font-size: 0.78rem;
-      color: #5A6C80;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    .demo-notice strong {
-      color: #2E86DE;
-    }
-
     /* Error message */
     .error-msg {
       background: rgba(231, 76, 60, 0.08);
@@ -746,6 +729,9 @@
         <button class="nav-btn" onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})">
           Open Staff Panel
         </button>
+        <a href="patient-portal.html" class="nav-btn" style="text-decoration:none;box-sizing:border-box;">
+          Patient — Submit query
+        </a>
       </div>
     </div>
   </header>
@@ -773,24 +759,10 @@
           Open Staff Panel
           <i class="fas fa-arrow-right"></i>
         </button>
-        <button class="hero-btn-secondary"
-          onclick="document.getElementById('auth-section').scrollIntoView({behavior:'smooth'})">
-          Request Demo
-        </button>
-      </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-value">99.9%</div>
-          <div class="hero-stat-label">Accuracy Rate</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">60%</div>
-          <div class="hero-stat-label">Time Saved</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">HIPAA</div>
-          <div class="hero-stat-label">Fully Compliant</div>
-        </div>
+        <a href="patient-portal.html" class="hero-btn-primary" style="text-decoration:none;box-sizing:border-box;">
+          Patient — Submit a query
+          <i class="fas fa-arrow-right"></i>
+        </a>
       </div>
     </div>
   </section>
@@ -814,12 +786,6 @@
         <h3>Human Oversight</h3>
         <p>Staff reviews and edits every message before it is sent to patients, ensuring that empathy and expert
           judgment are never bypassed.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
-        <h3>HIPAA Compliant</h3>
-        <p>Enterprise-grade security and end-to-end encryption to protect sensitive patient data at every stage of the
-          communication lifecycle.</p>
       </div>
     </div>
   </section>
@@ -852,6 +818,8 @@
           </div>
         </div>
 
+        <!-- Admin: login form -->
+        <div id="adminFormBlock">
         <!-- Error -->
         <div class="error-msg" id="errorMsg">
           <i class="fas fa-exclamation-circle"></i>
@@ -863,8 +831,8 @@
           <label class="light-label">Email Address</label>
           <div class="input-wrapper">
             <i class="fas fa-envelope input-icon"></i>
-            <input type="email" class="light-input" id="emailInput" placeholder="admin@hospital.com"
-              value="demo@hospital.com" autocomplete="email">
+            <input type="email" class="light-input" id="emailInput" placeholder="Enter your email"
+              autocomplete="email">
           </div>
         </div>
 
@@ -873,18 +841,8 @@
           <label class="light-label">Password</label>
           <div class="input-wrapper">
             <i class="fas fa-lock input-icon"></i>
-            <input type="password" class="light-input" id="passwordInput" placeholder="••••••••" value="Demo@1234"
+            <input type="password" class="light-input" id="passwordInput" placeholder="••••••••"
               autocomplete="current-password">
-          </div>
-        </div>
-
-        <!-- Hospital ID -->
-        <div class="form-group">
-          <label class="light-label">Hospital ID</label>
-          <div class="input-wrapper">
-            <i class="fas fa-hospital input-icon"></i>
-            <input type="text" class="light-input" id="hospitalInput" placeholder="e.g. hospital_abc"
-              value="demo_hospital">
           </div>
         </div>
 
@@ -893,11 +851,15 @@
           <i class="fas fa-sign-in-alt"></i>
           Sign In to Dashboard
         </button>
+        </div>
 
-        <!-- Demo Notice -->
-        <div class="demo-notice">
-          <strong>Demo Mode:</strong> Click "Sign In" to access the full platform with live mock data.<br>
-          Firebase Auth optional — demo bypasses authentication.
+        <!-- Patient: go to query page (no login) -->
+        <div id="patientFormBlock" style="display:none;">
+          <p class="subtitle" style="margin-bottom:20px;">Submit a medical query. No login required.</p>
+          <a href="patient-portal.html" class="login-btn" style="text-decoration:none;display:inline-flex;">
+            Go to query page
+            <i class="fas fa-arrow-right" style="margin-left:8px;"></i>
+          </a>
         </div>
       </div>
 
@@ -941,13 +903,9 @@
       selectedRole = role;
       document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('selected'));
       el.classList.add('selected');
-
-      const emailInput = document.getElementById('emailInput');
-      if (role === 'patient') {
-        emailInput.value = 'patient@hospital.com';
-      } else {
-        emailInput.value = 'demo@hospital.com';
-      }
+      const showAdmin = role === 'admin';
+      document.getElementById('adminFormBlock').style.display = showAdmin ? 'block' : 'none';
+      document.getElementById('patientFormBlock').style.display = showAdmin ? 'none' : 'block';
     }
 
     async function handleLogin() {
@@ -956,7 +914,7 @@
       const errText = document.getElementById('errorText');
       const email = document.getElementById('emailInput').value.trim();
       const password = document.getElementById('passwordInput').value;
-      const hospitalId = document.getElementById('hospitalInput').value.trim() || 'demo_hospital';
+      const hospitalId = 'demo_hospital';
 
       errDiv.style.display = 'none';
 

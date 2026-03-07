@@ -329,11 +329,7 @@
                     <span class="nav-icon"><i class="fas fa-th-large"></i></span><span
                         class="sidebar-label">Dashboard</span>
                 </div>
-                <div class="sidebar-nav-item" onclick="switchSection('analytics',this)" data-section="analytics">
-                    <span class="nav-icon"><i class="fas fa-chart-bar"></i></span><span
-                        class="sidebar-label">Analytics</span>
-                </div>
-                <div class="sidebar-nav-item" onclick="switchSection('alerts',this)" data-section="alerts">
+                <div class="sidebar-nav-item" onclick="window.location.href='alerts.html'">
                     <span class="nav-icon"><i class="fas fa-bell"></i></span><span class="sidebar-label">Alerts</span>
                     <span class="nav-badge" id="alertsBadge" style="display:none;">0</span>
                 </div>
@@ -403,9 +399,7 @@
                     <input type="text" class="search-input" placeholder="Search patients, queries...">
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn"
-                        onclick="switchSection('alerts', document.querySelector('[data-section=alerts]'))"
-                        title="Alerts">
+                    <button class="icon-btn" onclick="window.location.href='alerts.html'" title="Alerts">
                         <i class="fas fa-bell"></i><span class="notif-dot" id="notifDot"></span>
                     </button>
                     <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme">
@@ -475,30 +469,6 @@
                                 All →</button>
                         </div>
                         <div id="alertsContainer"></div>
-                    </div>
-                </section>
-
-                <!-- ============================= ANALYTICS ============================= -->
-                <section class="section-panel" id="sec-analytics">
-                    <div class="section-hdr">
-                        <div class="section-title">Analytics & Insights</div>
-                        <div class="section-sub">Deep-dive visualizations and trend analysis</div>
-                    </div>
-                    <div class="kpi-grid" id="kpiGridAnalytics"></div>
-                    <div class="pred-grid" id="predictionsContainer" style="margin-top:20px;"></div>
-                    <div class="charts-grid" style="margin-top:20px;">
-                        <div class="chart-card">
-                            <div class="card-header"><span class="card-title"><i class="fas fa-chart-bar"
-                                        style="margin-right:6px;color:var(--primary);"></i>Department Patient
-                                    Load</span></div>
-                            <canvas id="patientsChart2" style="height:250px;"></canvas>
-                        </div>
-                        <div class="chart-card">
-                            <div class="card-header"><span class="card-title"><i class="fas fa-chart-line"
-                                        style="margin-right:6px;color:#F39C12;"></i>Wait Time Trends (15-point)</span>
-                            </div>
-                            <canvas id="waitTimeChart2" style="height:250px;"></canvas>
-                        </div>
                     </div>
                 </section>
 
@@ -821,31 +791,6 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Urgency</label>
-                                    <div class="urgency-grid" style="margin-top:8px;">
-                                        <button class="urgency-pill low selected"
-                                            onclick="window.PatientPortal.selectUrgency('low', this)">🟢 Low</button>
-                                        <button class="urgency-pill medium"
-                                            onclick="window.PatientPortal.selectUrgency('medium', this)">🟡
-                                            Medium</button>
-                                        <button class="urgency-pill high"
-                                            onclick="window.PatientPortal.selectUrgency('high', this)">🔴 High</button>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Common Symptoms</label>
-                                    <div class="symptom-chips">
-                                        <span class="symptom-chip"
-                                            onclick="window.PatientPortal.toggleChip(this)">Fever</span>
-                                        <span class="symptom-chip"
-                                            onclick="window.PatientPortal.toggleChip(this)">Headache</span>
-                                        <span class="symptom-chip" onclick="window.PatientPortal.toggleChip(this)">Chest
-                                            Pain</span>
-                                        <span class="symptom-chip"
-                                            onclick="window.PatientPortal.toggleChip(this)">Cough</span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label>Message *</label>
                                     <textarea class="form-control" id="q-message" rows="4"></textarea>
                                 </div>
@@ -1123,7 +1068,6 @@
     <script src="../services/gemini.js"></script>
     <script src="../modules/analytics/analytics.js"></script>
     <script src="../modules/alerts/alerts.js"></script>
-    <script src="../modules/prediction/predict.js"></script>
     <script src="../modules/ai-response/ai-response.js"></script>
     <script src="../modules/workflow/workflow.js"></script>
     <script src="../modules/cdss/cdss.js"></script>
@@ -1133,7 +1077,7 @@
     <script>
         // ── Section Navigation ────────────────────────────────────────
         const SECTION_TITLES = {
-            'dashboard': 'Dashboard', 'analytics': 'Analytics & Insights', 'alerts': 'Smart Alert Engine',
+            'dashboard': 'Dashboard', 'alerts': 'Smart Alert Engine',
             'queries': 'Patient Queries', 'appointments': 'Appointments', 'workflow': 'Workflow Manager',
             'ai-responder': 'AI Response Assistant', 'cdss': 'Clinical CDSS', 'settings': 'Settings', 'patient': 'Patient Portal'
         };
@@ -1148,7 +1092,6 @@
             if (name === 'workflow') window.Workflow?.renderWorkflow?.();
             if (name === 'queries') { window.AIResponse?.renderQueryList?.(); document.getElementById('queryDetailPanel').style.display = 'none'; document.getElementById('incomingListView').style.display = 'block'; }
             if (name === 'ai-responder') window.AIResponse?.renderResponseHistory?.();
-            if (name === 'analytics') initAnalyticsSection();
         }
 
         // ── Sidebar Toggle ────────────────────────────────────────────
@@ -1389,16 +1332,15 @@
                 window.Analytics?.initCharts?.();
                 window.Analytics?.renderEfficiencyGauge?.();
                 window.Alerts?.loadDemoAlerts?.();
-                window.Predictions?.renderPredictions?.();
             };
             try {
                 const ref = window.FirebaseService?.getHospitalRef?.();
-                if (!ref) throw new Error('no ref');
+                if (!ref) return fallback();
+
                 ref.orderBy('createdAt', 'asc').onSnapshot(snap => {
                     console.log('✅ Firestore connected – loaded', snap.docs.length, 'records');
                     const records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     window.Analytics?.updateAnalyticsFromRecords?.(records);
-                    window.Predictions?.updatePredictionsFromRecords?.(records);
                     const m = window.Analytics?.MOCK_METRICS || {};
                     window.Alerts?.checkAlerts?.({ avgWait: m.avgWaitTime || 28, beds: m.bedsAvailable || 67, score: m.efficiencyScore || 82 });
                 }, err => {
@@ -1418,28 +1360,6 @@
                 const obs = new MutationObserver(() => { if (c1.innerHTML) c2.innerHTML = c1.innerHTML; });
                 obs.observe(c1, { childList: true, subtree: true });
             }
-        }
-
-        function initAnalyticsSection() {
-            const c2 = document.getElementById('patientsChart2')?.getContext('2d');
-            const w2 = document.getElementById('waitTimeChart2')?.getContext('2d');
-            if (c2 && !c2._done) {
-                const cols = window.Analytics?.MOCK_DEPT_DATA || [];
-                new Chart(c2, {
-                    type: 'bar', data: { labels: cols.map(d => d.dept), datasets: [{ label: 'Patients', data: cols.map(d => d.count), backgroundColor: ['#2E86DE', '#4CD137', '#F39C12', '#E74C3C', '#8b5cf6', '#06b6d4'], borderRadius: 8 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true } } }
-                });
-                c2._done = true;
-            }
-            if (w2 && !w2._done) {
-                const wt = [18, 22, 31, 28, 25, 33, 29, 26, 34, 28, 24, 30, 27, 28, 26];
-                new Chart(w2, {
-                    type: 'line', data: { labels: wt.map((_, i) => `${i + 1}h`), datasets: [{ label: 'Wait (min)', data: wt, borderColor: '#F39C12', backgroundColor: 'rgba(243,156,18,0.08)', fill: true, tension: 0.4, pointRadius: 3 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-                });
-                w2._done = true;
-            }
-            window.Predictions?.renderPredictions?.();
         }
 
         // ── User info ─────────────────────────────────────────────────

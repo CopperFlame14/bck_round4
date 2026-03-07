@@ -1,0 +1,342 @@
+/* apps/ui/alerts.css - Styling specific to the dedicated Alerts Page */
+
+/* Severity Colors */
+:root {
+    --alert-info: #2E86DE;
+    --alert-warning: #F39C12;
+    --alert-critical: #E74C3C;
+    --alert-critical-glow: rgba(231, 76, 60, 0.4);
+}
+
+.alerts-page-content {
+    animation: fade-in 0.4s ease-out;
+}
+
+/* 1. Summary Cards */
+.kpi-card-alert {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+}
+
+.kpi-card-alert:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.kpi-alert-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.kpi-card-alert .val {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.kpi-card-alert .lbl {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 2. Active Alerts Stacked Cards */
+.active-alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.active-alerts-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.active-alerts-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+.alert-row-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.alert-row-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Severity Indicator Bar */
+.severity-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+}
+
+.alert-row-card.severity-info .severity-bar {
+    background: var(--alert-info);
+}
+
+.alert-row-card.severity-warning .severity-bar {
+    background: var(--alert-warning);
+}
+
+.alert-row-card.severity-critical .severity-bar {
+    background: var(--alert-critical);
+}
+
+/* Pulsing effect for Critical */
+@keyframes pulse-critical {
+    0% {
+        box-shadow: 0 0 0 0 var(--alert-critical-glow);
+        border-color: var(--alert-critical);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+        border-color: rgba(231, 76, 60, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+        border-color: var(--alert-critical);
+    }
+}
+
+.alert-row-card.severity-critical {
+    animation: pulse-critical 2s infinite;
+}
+
+.alert-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.alert-row-card.severity-info .alert-icon-wrap {
+    background: rgba(46, 134, 222, 0.1);
+    color: var(--alert-info);
+}
+
+.alert-row-card.severity-warning .alert-icon-wrap {
+    background: rgba(243, 156, 18, 0.1);
+    color: var(--alert-warning);
+}
+
+.alert-row-card.severity-critical .alert-icon-wrap {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--alert-critical);
+}
+
+.alert-body {
+    flex: 1;
+}
+
+.alert-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+}
+
+.alert-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.alert-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.alert-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.alert-action {
+    background: var(--bg-secondary);
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+}
+
+.alert-action i {
+    color: var(--primary);
+}
+
+.alert-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-ack {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-ack:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.btn-res {
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    color: white;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-res:hover {
+    filter: brightness(1.1);
+}
+
+/* Handled state */
+.alert-row-card.acknowledged {
+    opacity: 0.8;
+}
+
+.alert-row-card.acknowledged .severity-bar {
+    background: var(--text-muted);
+}
+
+.alert-row-card.acknowledged .alert-icon-wrap {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.alert-row-card.acknowledged .btn-ack {
+    display: none;
+}
+
+.ack-badge {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+/* 3. Heatmap */
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.heatmap-tile {
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.heatmap-tile .dept-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 2;
+}
+
+.heatmap-tile .dept-stat {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+}
+
+.heatmap-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    z-index: 1;
+}
+
+/* Colors */
+.heatmap-normal .heatmap-bg {
+    background: #4CD137;
+}
+
+.heatmap-warning .heatmap-bg {
+    background: var(--alert-warning);
+}
+
+.heatmap-critical .heatmap-bg {
+    background: var(--alert-critical);
+}
+
+.heatmap-critical {
+    border-color: rgba(231, 76, 60, 0.5);
+}
+
+@media (max-width: 900px) {
+    .alerts-main-split {
+        grid-template-columns: 1fr !important;
+    }
+}

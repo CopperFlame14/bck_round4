@@ -8,40 +8,16 @@
  * The API key is stored server-side — never exposed to the browser.
  */
 
-// Primary: deployed bck3 backend on Render (working API key)
-const RENDER_ENDPOINT = 'https://bck-round3.onrender.com/suggest-response';
-// Secondary: local Node.js backend proxy
+// Primary: Local Python API endpoint
 const LOCAL_ENDPOINT = '/api/ai-response';
 
 /**
  * Generate AI-powered clinical response for a patient query.
- * Tries Render backend → local backend → local mock fallback.
+ * Tries the local Python API, and uses local mock fallback if unreachable.
  * Returns: { category, urgency, suggested_reply, source }
  */
 async function generateAIResponse(query, department = 'General Medicine', category = 'medical_query') {
-    // 1. Try the Render backend (bck3 — known working)
-    try {
-        const renderRes = await fetch(RENDER_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query })
-        });
-
-        if (renderRes.ok) {
-            const data = await renderRes.json();
-            console.log('✅ AI response from Render backend');
-            return {
-                category: data.category || category,
-                urgency: data.urgency || 'medium',
-                suggested_reply: data.suggested_reply || DEFAULT_REPLY,
-                source: 'render'
-            };
-        }
-    } catch (e) {
-        console.warn('Render backend unreachable:', e.message);
-    }
-
-    // 2. Try the local Node.js backend proxy
+    // 1. Try the local Python backend proxy
     try {
         const localRes = await fetch(LOCAL_ENDPOINT, {
             method: 'POST',
@@ -54,14 +30,14 @@ async function generateAIResponse(query, department = 'General Medicine', catego
             // If the backend returned a real Gemini response, use it
             if (result.source === 'gemini' || result.source === 'cache') {
                 if (!result.suggested_reply) result.suggested_reply = DEFAULT_REPLY;
-                console.log(`✅ AI response from local backend (source: ${result.source})`);
+                console.log(`✅ AI response from Python API (source: ${result.source})`);
                 return result;
             }
             // If backend returned a fallback, use our rich local draft instead
-            console.log('Local backend returned fallback. Using rich clinical draft.');
+            console.log('Python API returned fallback. Using rich clinical draft.');
         }
     } catch (e) {
-        console.warn('Local backend unreachable:', e.message);
+        console.warn('Python API unreachable:', e.message);
     }
 
     // 3. Fall back to local mock

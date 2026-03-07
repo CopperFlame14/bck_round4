@@ -160,76 +160,6 @@
             margin-top: 4px;
         }
 
-        /* Urgency selector */
-        .urgency-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-
-        .urgency-pill {
-            padding: 10px 8px;
-            border-radius: 10px;
-            border: 1.5px solid var(--border-strong);
-            background: var(--bg);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.18s;
-            color: #64748B;
-        }
-
-        .urgency-pill:hover {
-            border-color: #94A3B8;
-        }
-
-        .urgency-pill.low.selected {
-            border-color: #4CD137;
-            background: rgba(76, 209, 55, 0.08);
-            color: #27ae60;
-        }
-
-        .urgency-pill.medium.selected {
-            border-color: #F39C12;
-            background: rgba(243, 156, 18, 0.08);
-            color: #e67e22;
-        }
-
-        .urgency-pill.high.selected {
-            border-color: #E74C3C;
-            background: rgba(231, 76, 60, 0.08);
-            color: var(--critical);
-        }
-
-        /* Symptom chips */
-        .symptom-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .symptom-chip {
-            padding: 5px 12px;
-            border: 1.5px solid var(--border-strong);
-            border-radius: var(--radius-full);
-            font-size: 0.78rem;
-            cursor: pointer;
-            color: #64748B;
-            transition: all 0.15s;
-            background: white;
-            user-select: none;
-        }
-
-        .symptom-chip.selected {
-            border-color: var(--primary);
-            background: rgba(46, 134, 222, 0.08);
-            color: var(--primary);
-            font-weight: 500;
-        }
-
         /* Submit Area */
         .submit-area {
             margin-top: 24px;
@@ -327,10 +257,6 @@
             .info-strip {
                 grid-template-columns: 1fr;
             }
-
-            .urgency-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
         }
     </style>
 </head>
@@ -415,36 +341,6 @@
                         <option value="Psychiatry">Psychiatry</option>
                         <option value="Oncology">Oncology</option>
                     </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Urgency Level</label>
-                    <div class="urgency-grid" style="margin-top:8px;">
-                        <button class="urgency-pill low selected" onclick="selectUrgency('low', this)">🟢
-                            Low<br><small>Non-urgent</small></button>
-                        <button class="urgency-pill medium" onclick="selectUrgency('medium', this)">🟡
-                            Medium<br><small>Needs care soon</small></button>
-                        <button class="urgency-pill high" onclick="selectUrgency('high', this)">🔴
-                            High<br><small>Urgent</small></button>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Common Symptoms (tap to select)</label>
-                    <div class="symptom-chips" id="symptomChips">
-                        <span class="symptom-chip" onclick="toggleChip(this)">Fever</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Headache</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Chest Pain</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Shortness of Breath</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Fatigue</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Nausea</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Back Pain</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Dizziness</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Cough</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Rash</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Joint Pain</span>
-                        <span class="symptom-chip" onclick="toggleChip(this)">Stomach Pain</span>
-                    </div>
                 </div>
 
                 <div class="form-group">
@@ -588,8 +484,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="../services/firebase.js"></script>
     <script>
-        let selectedUrgency = 'low';
-
         // Tab switching
         function switchTab(tab) {
             document.getElementById('queryPanel').style.display = tab === 'query' ? 'block' : 'none';
@@ -598,19 +492,8 @@
             document.getElementById('tab-appt').classList.toggle('active', tab === 'appt');
         }
 
-        // Urgency selection
-        function selectUrgency(level, el) {
-            selectedUrgency = level;
-            document.querySelectorAll('.urgency-pill').forEach(p => p.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        // Symptom chips
-        function toggleChip(el) { el.classList.toggle('selected'); }
-
-        function getSelectedSymptoms() {
-            return Array.from(document.querySelectorAll('.symptom-chip.selected')).map(c => c.textContent).join(', ');
-        }
+        // Symptom chips (removed from UI; kept for compatibility)
+        function getSelectedSymptoms() { return ''; }
 
         // Character count
         document.getElementById('q-message')?.addEventListener('input', function () {
@@ -637,7 +520,7 @@
                 phone: document.getElementById('q-phone').value.trim(),
                 age: document.getElementById('q-age').value || null,
                 department: dept,
-                urgency: selectedUrgency,
+                urgency: 'low',
                 symptoms: getSelectedSymptoms(),
                 message,
                 status: 'pending',
