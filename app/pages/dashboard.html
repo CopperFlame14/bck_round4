@@ -329,10 +329,7 @@
                     <span class="nav-icon"><i class="fas fa-th-large"></i></span><span
                         class="sidebar-label">Dashboard</span>
                 </div>
-                <div class="sidebar-nav-item" onclick="window.location.href='alerts.html'">
-                    <span class="nav-icon"><i class="fas fa-bell"></i></span><span class="sidebar-label">Alerts</span>
-                    <span class="nav-badge" id="alertsBadge" style="display:none;">0</span>
-                </div>
+
                 <div class="sidebar-nav-item" onclick="switchSection('queries',this)" data-section="queries">
                     <span class="nav-icon"><i class="fas fa-inbox"></i></span><span class="sidebar-label">Patient
                         Queries</span>
@@ -399,9 +396,6 @@
                     <input type="text" class="search-input" placeholder="Search patients, queries...">
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn" onclick="window.location.href='alerts.html'" title="Alerts">
-                        <i class="fas fa-bell"></i><span class="notif-dot" id="notifDot"></span>
-                    </button>
                     <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme">
                         <i class="fas fa-sun" id="themeIcon"></i>
                     </button>
@@ -459,31 +453,10 @@
                         </div>
                     </div>
 
-                    <!-- Smart Alerts Preview -->
-                    <div class="card" style="margin-top:20px;">
-                        <div class="card-header">
-                            <span class="card-title"><i class="fas fa-bell"
-                                    style="margin-right:6px;color:#E74C3C;"></i>Active Alerts</span>
-                            <button class="btn btn-ghost btn-sm"
-                                onclick="switchSection('alerts',document.querySelector('[data-section=alerts]'))">View
-                                All →</button>
-                        </div>
-                        <div id="alertsContainer"></div>
-                    </div>
+
                 </section>
 
-                <!-- ============================= ALERTS ============================= -->
-                <section class="section-panel" id="sec-alerts">
-                    <div class="section-hdr flex-between">
-                        <div>
-                            <div class="section-title">Smart Alert Engine</div>
-                            <div class="section-sub">Real-time threshold monitoring across all departments</div>
-                        </div>
-                        <button class="btn btn-ghost btn-sm" onclick="window.Alerts.loadDemoAlerts()"><i
-                                class="fas fa-sync-alt"></i> Refresh</button>
-                    </div>
-                    <div id="alertsContainer2"></div>
-                </section>
+
 
                 <!-- ============================= PATIENT QUERIES ============================= -->
                 <section class="section-panel" id="sec-queries">

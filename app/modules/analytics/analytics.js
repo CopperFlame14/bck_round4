@@ -8,7 +8,7 @@ const MOCK_METRICS = {
     patientsToday: 142,
     avgWaitTime: 28,
     bedsAvailable: 67,
-    activeAlerts: 4,
+    bedsAvailable: 67,
     staffUtil: 78,
     efficiencyScore: 82
 };
@@ -55,13 +55,7 @@ function renderKpiCards(metrics = MOCK_METRICS) {
             delta: `${100 - metrics.bedsAvailable} occupied of 100`,
             deltaClass: metrics.bedsAvailable < 20 ? 'delta-up' : 'delta-flat', trend: ''
         },
-        {
-            id: 'kpi-alerts', icon: 'fa-bell', color: '#E74C3C', bgOpacity: '12',
-            label: 'Active Alerts',
-            value: metrics.activeAlerts,
-            delta: metrics.activeAlerts > 0 ? 'Requires attention' : 'All clear',
-            deltaClass: metrics.activeAlerts > 0 ? 'delta-up' : 'delta-down', trend: ''
-        },
+
         {
             id: 'kpi-staff', icon: 'fa-user-md', color: '#8b5cf6', bgOpacity: '12',
             label: 'Staff Utilization',
@@ -270,7 +264,7 @@ function updateAnalyticsFromRecords(records) {
         patientsToday: active.length,
         avgWaitTime: avgWait,
         bedsAvailable: bedsAvail,
-        activeAlerts: MOCK_METRICS.activeAlerts,
+
         staffUtil: MOCK_METRICS.staffUtil,
         efficiencyScore: score
     });
